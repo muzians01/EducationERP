@@ -1,0 +1,169 @@
+import { CurrencyPipe } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
+
+import { AppDataStore } from '../app.data';
+
+@Component({
+  selector: 'app-dashboard-page',
+  imports: [CurrencyPipe],
+  template: `
+    <section class="hero">
+      <div class="hero__content">
+        <p class="eyebrow">ERP Overview</p>
+        <h1>School operations at a glance</h1>
+        <p class="hero__summary">Move from overview into focused admissions, fees, and attendance workspaces.</p>
+      </div>
+
+      <div class="hero__panel">
+        <p class="panel__title">Operational focus</p>
+        <ul class="panel__list">
+          @for (item of focusAreas; track item.step) {
+            <li>
+              <span>{{ item.step }}</span>
+              <p>{{ item.summary }}</p>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    @if (store.loadError()) {
+      <section class="notice notice--error">
+        <strong>Backend connection needed.</strong>
+        <p>{{ store.loadError() }}</p>
+      </section>
+    }
+
+    <section class="metrics">
+      @for (metric of metrics(); track metric.label) {
+        <article class="metric-card">
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric.value }}</strong>
+          <p>{{ metric.description }}</p>
+        </article>
+      }
+    </section>
+
+    @if (store.isLoading()) {
+      <section class="notice">
+        <strong>Loading ERP workspace...</strong>
+        <p>Admissions, fee, and attendance data are being fetched from the API.</p>
+      </section>
+    } @else {
+      <section class="workspace">
+        <div class="section-heading">
+          <p class="eyebrow">Overview</p>
+          <h2>Current school pulse</h2>
+        </div>
+
+        <div class="workspace-grid">
+          <article class="data-card">
+            <div class="data-card__header">
+              <div>
+                <p class="eyebrow">Admissions</p>
+                <h3>Recent pipeline movement</h3>
+              </div>
+            </div>
+            @if (store.admissionsDashboard(); as admissions) {
+              <div class="application-list">
+                @for (application of admissions.recentApplications; track application.id) {
+                  <article class="application-item">
+                    <div class="application-item__main">
+                      <div>
+                        <strong>{{ application.studentName }}</strong>
+                        <p>{{ application.applicationNumber }} - {{ application.campusName }}</p>
+                      </div>
+                      <span class="status-chip" [class]="'status-chip status-chip--' + statusTone(application.status)">{{ application.status }}</span>
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+          </article>
+
+          <article class="data-card">
+            <div class="data-card__header">
+              <div>
+                <p class="eyebrow">Fees</p>
+                <h3>Recent receipts</h3>
+              </div>
+            </div>
+            @if (store.feesDashboard(); as fees) {
+              <div class="guardian-list">
+                @for (receipt of fees.recentReceipts; track receipt.id) {
+                  <article class="guardian-item">
+                    <strong>{{ receipt.studentName }}</strong>
+                    <p>{{ receipt.feeName }} - {{ receipt.paymentMethod }}</p>
+                    <span>{{ receipt.amount | currency: 'INR':'symbol':'1.0-0' }}</span>
+                  </article>
+                }
+              </div>
+            }
+          </article>
+
+          <article class="data-card">
+            <div class="data-card__header">
+              <div>
+                <p class="eyebrow">Attendance</p>
+                <h3>Students needing attention</h3>
+              </div>
+            </div>
+            @if (store.attendanceMonthlyReport(); as report) {
+              <div class="guardian-list">
+                @for (student of report.studentsNeedingAttention; track student.studentId) {
+                  <article class="guardian-item">
+                    <strong>{{ student.studentName }}</strong>
+                    <p>{{ student.className }} / {{ student.sectionName }}</p>
+                    <span>{{ student.attendancePercentage }}% attendance</span>
+                  </article>
+                }
+              </div>
+            }
+          </article>
+
+          <article class="data-card">
+            <div class="data-card__header">
+              <div>
+                <p class="eyebrow">Readiness</p>
+                <h3>Profile and document closure</h3>
+              </div>
+            </div>
+            <div class="guardian-list">
+              @for (profile of store.studentProfiles(); track profile.id) {
+                <article class="guardian-item">
+                  <strong>{{ profile.studentName }}</strong>
+                  <p>{{ profile.profileCompletionPercentage }}% complete</p>
+                  <span>{{ profile.pendingDocumentCount }} pending document(s)</span>
+                </article>
+              }
+            </div>
+          </article>
+        </div>
+      </section>
+    }
+  `
+})
+export class DashboardPageComponent {
+  protected readonly store = inject(AppDataStore);
+  protected readonly statusTone = (status: string) => status.toLowerCase().replace(/\s+/g, '-');
+  protected readonly focusAreas = [
+    { step: 'Admissions pulse', summary: 'Track new, approved, and waiting applications.' },
+    { step: 'Collections watch', summary: 'See what was collected and what is still pending.' },
+    { step: 'Attendance risk', summary: 'Spot students and classes that need intervention.' }
+  ];
+
+  protected readonly metrics = computed(() => {
+    const admissions = this.store.admissionsDashboard();
+    const fees = this.store.feesDashboard();
+    const attendance = this.store.attendanceDashboard();
+    const report = this.store.attendanceMonthlyReport();
+
+    return [
+      { label: 'Applications', value: admissions?.totalApplications.toString() ?? '--', description: 'Students in the admissions funnel.' },
+      { label: 'Outstanding Fees', value: fees ? `Rs ${fees.outstandingAmount}` : '--', description: 'Net amount still awaiting collection.' },
+      { label: 'Attendance Today', value: attendance?.totalStudentsMarked.toString() ?? '--', description: 'Rows captured in the latest attendance session.' },
+      { label: 'Monthly Attendance', value: report ? `${report.overallAttendancePercentage}%` : '--', description: 'Overall trend for the latest month.' },
+      { label: 'Pending Docs', value: this.store.pendingDocumentsCount().toString(), description: 'Student documents waiting to be cleared.' }
+    ];
+  });
+}

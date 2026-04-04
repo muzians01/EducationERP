@@ -1,0 +1,31 @@
+<main class="app-shell app-shell--wide">
+  <section class="shell-header">
+    <div>
+      <p class="eyebrow">Education ERP</p>
+      <h1>{{ title }}</h1>
+      <p class="hero__summary">
+        Navigate real module screens instead of staying on a single dashboard. Admissions, fees, and attendance now have dedicated views.
+      </p>
+    </div>
+
+    <div class="hero__actions">
+      <a class="button button--primary" href="http://localhost:5093/swagger" target="_blank" rel="noreferrer">
+        Open Swagger
+      </a>
+    </div>
+  </section>
+
+  <nav class="module-nav">
+    @for (item of navItems; track item.path) {
+      <a
+        class="module-nav__link"
+        [routerLink]="item.path"
+        routerLinkActive="module-nav__link--active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }">
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <router-outlet />
+</main>

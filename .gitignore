@@ -1,0 +1,11 @@
+bin/
+obj/
+.angular/
+node_modules/
+dist/
+.vs/
+.vscode/
+*.user
+*.suo
+*.dbmdl
+TestResults/

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="EducationERP.Api.Tests/EducationERP.Api.Tests.csproj" />
+  <Project Path="EducationERP.Api/EducationERP.Api.csproj" />
+  <Project Path="EducationERP.Application/EducationERP.Application.csproj" />
+  <Project Path="EducationERP.Domain/EducationERP.Domain.csproj" />
+  <Project Path="EducationERP.Infrastructure/EducationERP.Infrastructure.csproj" />
+</Solution>
