@@ -5,6 +5,8 @@ using EducationERP.Application.Attendance;
 using EducationERP.Application.Campuses;
 using EducationERP.Application.Examinations;
 using EducationERP.Application.Fees;
+using EducationERP.Application.Homework;
+using EducationERP.Application.ParentPortal;
 using EducationERP.Application.Students;
 using EducationERP.Infrastructure;
 using EducationERP.Infrastructure.Persistence;
@@ -146,6 +148,34 @@ app.MapGet("/api/examinations/dashboard", async (int? examTermId, int? classId, 
     return Results.Ok(dashboard);
 })
 .WithName("GetExaminationsDashboard");
+
+app.MapGet("/api/homework/assignments", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
+{
+    var assignments = await homeworkService.GetAssignmentsAsync(classId, sectionId, cancellationToken);
+    return Results.Ok(assignments);
+})
+.WithName("GetHomeworkAssignments");
+
+app.MapGet("/api/homework/progress", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
+{
+    var progress = await homeworkService.GetProgressAsync(classId, sectionId, cancellationToken);
+    return Results.Ok(progress);
+})
+.WithName("GetHomeworkProgress");
+
+app.MapGet("/api/homework/dashboard", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
+{
+    var dashboard = await homeworkService.GetDashboardAsync(classId, sectionId, cancellationToken);
+    return Results.Ok(dashboard);
+})
+.WithName("GetHomeworkDashboard");
+
+app.MapGet("/api/parent-portal/dashboard", async (int? studentId, IParentPortalService parentPortalService, CancellationToken cancellationToken) =>
+{
+    var dashboard = await parentPortalService.GetDashboardAsync(studentId, cancellationToken);
+    return Results.Ok(dashboard);
+})
+.WithName("GetParentPortalDashboard");
 
 app.MapGet("/api/admissions/applications", async (IAdmissionsService admissionsService, CancellationToken cancellationToken) =>
 {

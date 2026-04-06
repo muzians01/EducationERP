@@ -8,6 +8,8 @@ using EducationERP.Api.Tests.Infrastructure;
 using EducationERP.Application.Campuses;
 using EducationERP.Application.Examinations;
 using EducationERP.Application.Fees;
+using EducationERP.Application.Homework;
+using EducationERP.Application.ParentPortal;
 using EducationERP.Application.Students;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
@@ -90,6 +92,31 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         Assert.Equal("B", dashboard.SelectedSectionName);
         Assert.Equal(2, dashboard.Schedule.Count);
         Assert.Single(dashboard.ReportCards);
+    }
+
+    [Fact]
+    public async Task ParentPortalDashboardEndpoint_ReturnsStudentFacingSnapshot()
+    {
+        var dashboard = await _client.GetFromJsonAsync<ParentPortalDashboardDto>("/api/parent-portal/dashboard");
+
+        Assert.NotNull(dashboard);
+        Assert.Equal("Ishita Verma", dashboard.StudentName);
+        Assert.Equal("Anjali Verma", dashboard.GuardianName);
+        Assert.Single(dashboard.UpcomingHomework);
+        Assert.Single(dashboard.OutstandingFeeItems);
+        Assert.Single(dashboard.ExamResults);
+    }
+
+    [Fact]
+    public async Task HomeworkDashboardEndpoint_ReturnsAssignmentsAndProgress()
+    {
+        var dashboard = await _client.GetFromJsonAsync<HomeworkDashboardDto>("/api/homework/dashboard");
+
+        Assert.NotNull(dashboard);
+        Assert.Equal("Grade 1", dashboard.SelectedClassName);
+        Assert.Equal("B", dashboard.SelectedSectionName);
+        Assert.Single(dashboard.Assignments);
+        Assert.Single(dashboard.Progress);
     }
 
     [Fact]

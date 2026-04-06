@@ -9,6 +9,8 @@ public sealed class EducationErpDbContext(DbContextOptions<EducationErpDbContext
     public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<TimetablePeriod> TimetablePeriods => Set<TimetablePeriod>();
+    public DbSet<HomeworkAssignment> HomeworkAssignments => Set<HomeworkAssignment>();
+    public DbSet<StudentHomeworkSubmission> StudentHomeworkSubmissions => Set<StudentHomeworkSubmission>();
     public DbSet<ExamTerm> ExamTerms => Set<ExamTerm>();
     public DbSet<ExamSchedule> ExamSchedules => Set<ExamSchedule>();
     public DbSet<StudentExamScore> StudentExamScores => Set<StudentExamScore>();

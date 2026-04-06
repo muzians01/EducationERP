@@ -17,8 +17,10 @@ export class App {
     { label: 'Admissions', path: '/admissions' },
     { label: 'Academics', path: '/academics' },
     { label: 'Examinations', path: '/examinations' },
+    { label: 'Homework', path: '/homework' },
     { label: 'Fees', path: '/fees' },
-    { label: 'Attendance', path: '/attendance' }
+    { label: 'Attendance', path: '/attendance' },
+    { label: 'Parent Portal', path: '/parent-portal' }
   ];
   private readonly store = inject(AppDataStore);
 

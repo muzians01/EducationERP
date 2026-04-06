@@ -64,6 +64,35 @@ describe('App', () => {
       schedule: [],
       reportCards: []
     });
+    httpTesting.expectOne('http://localhost:5093/api/homework/dashboard').flush({
+      selectedClassId: 1,
+      selectedClassName: 'Grade 1',
+      selectedSectionId: 2,
+      selectedSectionName: 'B',
+      activeAssignments: 1,
+      pendingSubmissions: 1,
+      assignments: [],
+      progress: []
+    });
+    httpTesting.expectOne('http://localhost:5093/api/parent-portal/dashboard').flush({
+      studentId: 1,
+      studentName: 'Ishita Verma',
+      admissionNumber: 'STU-2026-001',
+      className: 'Grade 1',
+      sectionName: 'B',
+      guardianName: 'Anjali Verma',
+      guardianPhoneNumber: '9876500001',
+      attendancePercentage: 83.5,
+      outstandingFees: 12000,
+      currentExamTerm: 'Term 1 Assessment',
+      latestExamPercentage: 88.5,
+      announcements: [],
+      upcomingHomework: [],
+      outstandingFeeItems: [],
+      examResults: [],
+      todayTimetable: [],
+      recentAttendance: []
+    });
     httpTesting.expectOne('http://localhost:5093/api/attendance/dashboard').flush({
       attendanceDate: '2026-04-03',
       totalStudentsMarked: 1,
@@ -157,6 +186,35 @@ describe('App', () => {
       examTerms: [],
       schedule: [],
       reportCards: []
+    });
+    httpTesting.expectOne('http://localhost:5093/api/homework/dashboard').flush({
+      selectedClassId: 1,
+      selectedClassName: 'Grade 1',
+      selectedSectionId: 2,
+      selectedSectionName: 'B',
+      activeAssignments: 1,
+      pendingSubmissions: 1,
+      assignments: [],
+      progress: []
+    });
+    httpTesting.expectOne('http://localhost:5093/api/parent-portal/dashboard').flush({
+      studentId: 1,
+      studentName: 'Ishita Verma',
+      admissionNumber: 'STU-2026-001',
+      className: 'Grade 1',
+      sectionName: 'B',
+      guardianName: 'Anjali Verma',
+      guardianPhoneNumber: '9876500001',
+      attendancePercentage: 83.5,
+      outstandingFees: 12000,
+      currentExamTerm: 'Term 1 Assessment',
+      latestExamPercentage: 88.5,
+      announcements: [],
+      upcomingHomework: [],
+      outstandingFeeItems: [],
+      examResults: [],
+      todayTimetable: [],
+      recentAttendance: []
     });
     httpTesting.expectOne('http://localhost:5093/api/attendance/dashboard').flush({
       attendanceDate: '2026-04-03',

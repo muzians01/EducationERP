@@ -27,6 +27,109 @@ export interface ExaminationsDashboard {
   reportCards: StudentReportCard[];
 }
 
+export interface ParentPortalDashboard {
+  studentId: number;
+  studentName: string;
+  admissionNumber: string;
+  className: string;
+  sectionName: string;
+  guardianName: string;
+  guardianPhoneNumber: string;
+  attendancePercentage: number;
+  outstandingFees: number;
+  currentExamTerm: string;
+  latestExamPercentage: number;
+  announcements: ParentPortalAnnouncement[];
+  upcomingHomework: ParentPortalHomework[];
+  outstandingFeeItems: ParentPortalFeeItem[];
+  examResults: ParentPortalExamResult[];
+  todayTimetable: ParentPortalTimetableItem[];
+  recentAttendance: ParentPortalAttendanceEntry[];
+}
+
+export interface HomeworkDashboard {
+  selectedClassId: number;
+  selectedClassName: string;
+  selectedSectionId: number;
+  selectedSectionName: string;
+  activeAssignments: number;
+  pendingSubmissions: number;
+  assignments: HomeworkAssignment[];
+  progress: StudentHomeworkProgress[];
+}
+
+export interface HomeworkAssignment {
+  id: number;
+  classId: number;
+  className: string;
+  sectionId: number;
+  sectionName: string;
+  subjectId: number;
+  subjectName: string;
+  assignedOn: string;
+  dueOn: string;
+  title: string;
+  instructions: string;
+  assignedBy: string;
+}
+
+export interface StudentHomeworkProgress {
+  homeworkAssignmentId: number;
+  studentId: number;
+  studentName: string;
+  admissionNumber: string;
+  homeworkTitle: string;
+  dueOn: string;
+  status: string;
+  submittedOn: string | null;
+  remarks: string | null;
+}
+
+export interface ParentPortalAnnouncement {
+  title: string;
+  message: string;
+  publishDate: string;
+}
+
+export interface ParentPortalHomework {
+  subjectName: string;
+  title: string;
+  dueOn: string;
+  status: string;
+  instructions: string;
+}
+
+export interface ParentPortalFeeItem {
+  feeName: string;
+  dueOn: string;
+  balanceAmount: number;
+  status: string;
+}
+
+export interface ParentPortalExamResult {
+  examTermName: string;
+  subjectName: string;
+  marksObtained: number;
+  maxMarks: number;
+  grade: string;
+  resultStatus: string;
+}
+
+export interface ParentPortalTimetableItem {
+  dayOfWeek: string;
+  periodNumber: number;
+  subjectName: string;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+}
+
+export interface ParentPortalAttendanceEntry {
+  attendanceDate: string;
+  status: string;
+  remarks: string | null;
+}
+
 export interface ExamTerm {
   id: number;
   name: string;

@@ -14,6 +14,8 @@ import {
   ClassAttendanceRegister,
   ExaminationsDashboard,
   FeesDashboard,
+  HomeworkDashboard,
+  ParentPortalDashboard,
   Student,
   StudentDocument,
   StudentProfileOverview
@@ -31,6 +33,8 @@ export class AppDataStore {
   readonly feesDashboard = signal<FeesDashboard | null>(null);
   readonly academicsDashboard = signal<AcademicsDashboard | null>(null);
   readonly examinationsDashboard = signal<ExaminationsDashboard | null>(null);
+  readonly homeworkDashboard = signal<HomeworkDashboard | null>(null);
+  readonly parentPortalDashboard = signal<ParentPortalDashboard | null>(null);
   readonly attendanceDashboard = signal<AttendanceDashboard | null>(null);
   readonly attendanceMonthlyReport = signal<AttendanceMonthlyReport | null>(null);
   readonly attendanceEntryBoard = signal<AttendanceEntryBoard | null>(null);
@@ -165,6 +169,26 @@ export class AppDataStore {
     });
   }
 
+  loadHomeworkDashboard(classId: number | null, sectionId: number | null): void {
+    const query = this.buildClassSectionQuery(classId, sectionId);
+
+    this.http.get<HomeworkDashboard>(`${this.apiBaseUrl}/homework/dashboard${query}`).subscribe({
+      next: (dashboard) => {
+        this.homeworkDashboard.set(dashboard);
+      }
+    });
+  }
+
+  loadParentPortal(studentId: number | null): void {
+    const query = studentId ? `?studentId=${studentId}` : '';
+
+    this.http.get<ParentPortalDashboard>(`${this.apiBaseUrl}/parent-portal/dashboard${query}`).subscribe({
+      next: (dashboard) => {
+        this.parentPortalDashboard.set(dashboard);
+      }
+    });
+  }
+
   private refreshAttendanceModule(attendanceDate: string, classId: number | null, sectionId: number | null, successMessage: string): void {
     this.fetchAttendanceModule(attendanceDate, classId, sectionId).subscribe({
       next: (payload) => {
@@ -205,6 +229,8 @@ export class AppDataStore {
       feesDashboard: this.http.get<FeesDashboard>(`${this.apiBaseUrl}/fees/dashboard`),
       academicsDashboard: this.http.get<AcademicsDashboard>(`${this.apiBaseUrl}/academics/dashboard`),
       examinationsDashboard: this.http.get<ExaminationsDashboard>(`${this.apiBaseUrl}/examinations/dashboard`),
+      homeworkDashboard: this.http.get<HomeworkDashboard>(`${this.apiBaseUrl}/homework/dashboard`),
+      parentPortalDashboard: this.http.get<ParentPortalDashboard>(`${this.apiBaseUrl}/parent-portal/dashboard`),
       attendanceDashboard: this.http.get<AttendanceDashboard>(`${this.apiBaseUrl}/attendance/dashboard`),
       attendanceMonthlyReport: this.http.get<AttendanceMonthlyReport>(`${this.apiBaseUrl}/attendance/monthly-report`),
       attendanceEntryBoard: this.http.get<AttendanceEntryBoard>(`${this.apiBaseUrl}/attendance/entry-board`),
@@ -222,6 +248,8 @@ export class AppDataStore {
     feesDashboard: FeesDashboard;
     academicsDashboard: AcademicsDashboard;
     examinationsDashboard: ExaminationsDashboard;
+    homeworkDashboard: HomeworkDashboard;
+    parentPortalDashboard: ParentPortalDashboard;
     attendanceDashboard: AttendanceDashboard;
     attendanceMonthlyReport: AttendanceMonthlyReport;
     attendanceEntryBoard: AttendanceEntryBoard;
@@ -236,6 +264,8 @@ export class AppDataStore {
     this.feesDashboard.set(payload.feesDashboard);
     this.academicsDashboard.set(payload.academicsDashboard);
     this.examinationsDashboard.set(payload.examinationsDashboard);
+    this.homeworkDashboard.set(payload.homeworkDashboard);
+    this.parentPortalDashboard.set(payload.parentPortalDashboard);
     this.attendanceDashboard.set(payload.attendanceDashboard);
     this.attendanceMonthlyReport.set(payload.attendanceMonthlyReport);
     this.attendanceEntryBoard.set(payload.attendanceEntryBoard);
