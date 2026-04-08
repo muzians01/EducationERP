@@ -18,6 +18,16 @@ public sealed class Campus : BaseEntity
         BoardAffiliation = boardAffiliation.Trim();
     }
 
+    public void UpdateDetails(string code, string name, string city, string state, string country, string boardAffiliation)
+    {
+        Code = code.Trim().ToUpperInvariant();
+        Name = name.Trim();
+        City = city.Trim();
+        State = state.Trim();
+        Country = country.Trim();
+        BoardAffiliation = boardAffiliation.Trim();
+    }
+
     public string Code { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;
     public string City { get; private set; } = string.Empty;

@@ -11,5 +11,6 @@ public interface IAttendanceService
     Task<AttendanceDashboardDto> GetDashboardAsync(DateOnly? attendanceDate = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default);
     Task<AttendanceEntryBoardDto> SaveEntryBoardAsync(AttendanceEntryBoardSaveRequestDto request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AttendanceLeaveRequestDto>> GetLeaveRequestsAsync(DateOnly? attendanceDate = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default);
+    Task<AttendanceLeaveRequestDto> CreateLeaveRequestAsync(CreateAttendanceLeaveRequestDto request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AttendanceLeaveRequestDto>> UpdateLeaveRequestStatusAsync(int leaveRequestId, AttendanceLeaveDecisionRequestDto request, DateOnly? attendanceDate = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default);
 }

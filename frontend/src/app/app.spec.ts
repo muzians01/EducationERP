@@ -133,6 +133,7 @@ describe('App', () => {
     });
     httpTesting.expectOne('http://localhost:5093/api/attendance/leave-requests').flush([]);
     httpTesting.expectOne('http://localhost:5093/api/academic-structure').flush({
+      campuses: [{ id: 1, code: 'TEST', name: 'Test Campus', city: 'Bengaluru', state: 'Karnataka', country: 'India', boardAffiliation: 'CBSE' }],
       academicYears: [],
       classes: [{ id: 1, campusId: 1, code: 'G1', name: 'Grade 1', displayOrder: 1 }],
       sections: [{ id: 2, schoolClassId: 1, schoolClassName: 'Grade 1', name: 'B', capacity: 35, roomNumber: 'G1-B01' }]
@@ -256,6 +257,7 @@ describe('App', () => {
     });
     httpTesting.expectOne('http://localhost:5093/api/attendance/leave-requests').flush([]);
     httpTesting.expectOne('http://localhost:5093/api/academic-structure').flush({
+      campuses: [{ id: 1, code: 'TEST', name: 'Test Campus', city: 'Bengaluru', state: 'Karnataka', country: 'India', boardAffiliation: 'CBSE' }],
       academicYears: [],
       classes: [{ id: 1, campusId: 1, code: 'G1', name: 'Grade 1', displayOrder: 1 }],
       sections: [{ id: 2, schoolClassId: 1, schoolClassName: 'Grade 1', name: 'B', capacity: 35, roomNumber: 'G1-B01' }]

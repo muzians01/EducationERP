@@ -16,6 +16,14 @@ public sealed class Section : BaseEntity
         RoomNumber = roomNumber.Trim().ToUpperInvariant();
     }
 
+    public void UpdateDetails(int schoolClassId, string name, int capacity, string roomNumber)
+    {
+        SchoolClassId = schoolClassId;
+        Name = name.Trim().ToUpperInvariant();
+        Capacity = capacity;
+        RoomNumber = roomNumber.Trim().ToUpperInvariant();
+    }
+
     public int SchoolClassId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public int Capacity { get; private set; }

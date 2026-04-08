@@ -31,6 +31,16 @@ public sealed class StudentFee : BaseEntity
     public decimal AmountPaid { get; private set; }
     public string Status { get; private set; } = string.Empty;
 
+    public void UpdateAmountPaid(decimal amountPaid)
+    {
+        AmountPaid = amountPaid;
+    }
+
+    public void UpdateStatus(string status)
+    {
+        Status = status.Trim();
+    }
+
     public Student? Student { get; private set; }
     public FeeStructure? FeeStructure { get; private set; }
     public ICollection<FeePayment> Payments { get; private set; } = [];

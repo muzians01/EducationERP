@@ -47,4 +47,28 @@ public sealed class TimetablePeriod : BaseEntity
     public SchoolClass? SchoolClass { get; private set; }
     public Section? Section { get; private set; }
     public Subject? Subject { get; private set; }
+
+    public void UpdatePeriod(
+        int academicYearId,
+        int schoolClassId,
+        int sectionId,
+        int subjectId,
+        DayOfWeek dayOfWeek,
+        int periodNumber,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        string teacherName,
+        string roomNumber)
+    {
+        AcademicYearId = academicYearId;
+        SchoolClassId = schoolClassId;
+        SectionId = sectionId;
+        SubjectId = subjectId;
+        DayOfWeek = dayOfWeek;
+        PeriodNumber = periodNumber;
+        StartTime = startTime;
+        EndTime = endTime;
+        TeacherName = teacherName.Trim();
+        RoomNumber = roomNumber.Trim().ToUpperInvariant();
+    }
 }

@@ -1,24 +1,71 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 import {
   AcademicStructure,
   AcademicsDashboard,
+  AdmissionApplication,
   AdmissionsDashboard,
   AttendanceDashboard,
   AttendanceEntryBoard,
   AttendanceEntryDraft,
   AttendanceLeaveRequest,
   AttendanceMonthlyReport,
+  Campus,
   ClassAttendanceRegister,
+  CreateAcademicYear,
+  CreateCampus,
+  CreateExamSchedule,
+  CreateExamTerm,
+  CreateAttendanceLeaveRequest,
+  CreateAdmissionApplication,
+  CreateFeeConcession,
+  CreateHomeworkAssignment,
+  CreateSchoolClass,
+  CreateSection,
+  CreateTransportRoute,
+  CreateTransportVehicle,
+  CreateSubject,
+  CreateTimetablePeriod,
+  AcademicYear,
   ExaminationsDashboard,
+  ExamSchedule,
+  ExamTerm,
+  FeeReceipt,
+  FeeConcession,
+  FeePayment,
+  FeeStructure,
   FeesDashboard,
+  Guardian,
+  HomeworkAssignment,
+  SchoolClass,
+  Section,
+  Subject,
+  StudentHomeworkProgress,
+  TimetablePeriod,
+  UpdateAcademicYear,
+  UpdateCampus,
+  UpdateExamSchedule,
+  UpdateExamTerm,
+  UpdateHomeworkAssignment,
+  UpdateHomeworkSubmission,
+  UpdateSchoolClass,
+  UpdateSection,
+  UpdateSubject,
+  UpdateTimetablePeriod,
   HomeworkDashboard,
   ParentPortalDashboard,
+  RecordFeePayment,
   Student,
   StudentDocument,
-  StudentProfileOverview
+  StudentProfileOverview,
+  TransportDashboard,
+  TransportRoute,
+  TransportVehicle,
+  UpdateTransportRoute,
+  UpdateTransportVehicle,
+  UpdateFeePayment
 } from './app.models';
 
 @Injectable({ providedIn: 'root' })
@@ -30,7 +77,13 @@ export class AppDataStore {
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
   readonly admissionsDashboard = signal<AdmissionsDashboard | null>(null);
+  readonly admissionApplications = signal<AdmissionApplication[]>([]);
+  readonly admissionGuardians = signal<Guardian[]>([]);
   readonly feesDashboard = signal<FeesDashboard | null>(null);
+  readonly feeStructures = signal<FeeStructure[]>([]);
+  readonly feePayments = signal<FeePayment[]>([]);
+  readonly feeConcessions = signal<FeeConcession[]>([]);
+  readonly feeReceipts = signal<FeeReceipt[]>([]);
   readonly academicsDashboard = signal<AcademicsDashboard | null>(null);
   readonly examinationsDashboard = signal<ExaminationsDashboard | null>(null);
   readonly homeworkDashboard = signal<HomeworkDashboard | null>(null);
@@ -40,12 +93,16 @@ export class AppDataStore {
   readonly attendanceEntryBoard = signal<AttendanceEntryBoard | null>(null);
   readonly classAttendanceRegister = signal<ClassAttendanceRegister | null>(null);
   readonly attendanceLeaveRequests = signal<AttendanceLeaveRequest[]>([]);
+  readonly transportDashboard = signal<TransportDashboard | null>(null);
+  readonly transportRoutes = signal<TransportRoute[]>([]);
+  readonly transportVehicles = signal<TransportVehicle[]>([]);
   readonly academicStructure = signal<AcademicStructure | null>(null);
   readonly students = signal<Student[]>([]);
   readonly studentProfiles = signal<StudentProfileOverview[]>([]);
   readonly studentDocuments = signal<StudentDocument[]>([]);
   readonly isSavingAttendance = signal(false);
   readonly isUpdatingLeave = signal(false);
+  readonly isCreatingLeave = signal(false);
   readonly attendanceSaveMessage = signal<string | null>(null);
   readonly selectedAttendanceDate = signal<string | null>(null);
   readonly selectedClassId = signal<number | null>(null);
@@ -149,6 +206,22 @@ export class AppDataStore {
     });
   }
 
+  createLeaveRequest(request: CreateAttendanceLeaveRequest): void {
+    this.isCreatingLeave.set(true);
+    this.attendanceSaveMessage.set(null);
+
+    this.http.post(`${this.apiBaseUrl}/attendance/leave-requests`, request).subscribe({
+      next: () => {
+        this.isCreatingLeave.set(false);
+        this.refreshAttendanceModule(request.leaveDate, this.selectedClassId(), this.selectedSectionId(), 'Leave request submitted successfully.');
+      },
+      error: () => {
+        this.isCreatingLeave.set(false);
+        this.attendanceSaveMessage.set('Leave request could not be submitted.');
+      }
+    });
+  }
+
   loadAcademicsDashboard(classId: number | null, sectionId: number | null): void {
     const query = this.buildClassSectionQuery(classId, sectionId);
 
@@ -157,6 +230,86 @@ export class AppDataStore {
         this.academicsDashboard.set(dashboard);
       }
     });
+  }
+
+  loadAcademicStructure(): void {
+    this.http.get<AcademicStructure>(`${this.apiBaseUrl}/academic-structure`).subscribe({
+      next: (structure) => {
+        this.academicStructure.set(structure);
+      }
+    });
+  }
+
+  createCampus(dto: CreateCampus): Observable<Campus> {
+    return this.http.post<Campus>(`${this.apiBaseUrl}/campuses`, dto);
+  }
+
+  updateCampus(campusId: number, dto: UpdateCampus): Observable<Campus> {
+    return this.http.put<Campus>(`${this.apiBaseUrl}/campuses/${campusId}`, dto);
+  }
+
+  deleteCampus(campusId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/campuses/${campusId}`);
+  }
+
+  createAcademicYear(dto: CreateAcademicYear): Observable<AcademicYear> {
+    return this.http.post<AcademicYear>(`${this.apiBaseUrl}/academic-structure/academic-years`, dto);
+  }
+
+  updateAcademicYear(academicYearId: number, dto: UpdateAcademicYear): Observable<AcademicYear> {
+    return this.http.put<AcademicYear>(`${this.apiBaseUrl}/academic-structure/academic-years/${academicYearId}`, dto);
+  }
+
+  deleteAcademicYear(academicYearId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academic-structure/academic-years/${academicYearId}`);
+  }
+
+  createSchoolClass(dto: CreateSchoolClass): Observable<SchoolClass> {
+    return this.http.post<SchoolClass>(`${this.apiBaseUrl}/academic-structure/classes`, dto);
+  }
+
+  updateSchoolClass(schoolClassId: number, dto: UpdateSchoolClass): Observable<SchoolClass> {
+    return this.http.put<SchoolClass>(`${this.apiBaseUrl}/academic-structure/classes/${schoolClassId}`, dto);
+  }
+
+  deleteSchoolClass(schoolClassId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academic-structure/classes/${schoolClassId}`);
+  }
+
+  createSection(dto: CreateSection): Observable<Section> {
+    return this.http.post<Section>(`${this.apiBaseUrl}/academic-structure/sections`, dto);
+  }
+
+  updateSection(sectionId: number, dto: UpdateSection): Observable<Section> {
+    return this.http.put<Section>(`${this.apiBaseUrl}/academic-structure/sections/${sectionId}`, dto);
+  }
+
+  deleteSection(sectionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academic-structure/sections/${sectionId}`);
+  }
+
+  createSubject(dto: CreateSubject): Observable<Subject> {
+    return this.http.post<Subject>(`${this.apiBaseUrl}/academics/subjects`, dto);
+  }
+
+  updateSubject(subjectId: number, dto: UpdateSubject): Observable<Subject> {
+    return this.http.put<Subject>(`${this.apiBaseUrl}/academics/subjects/${subjectId}`, dto);
+  }
+
+  deleteSubject(subjectId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academics/subjects/${subjectId}`);
+  }
+
+  createTimetablePeriod(dto: CreateTimetablePeriod): Observable<TimetablePeriod> {
+    return this.http.post<TimetablePeriod>(`${this.apiBaseUrl}/academics/timetable`, dto);
+  }
+
+  updateTimetablePeriod(periodId: number, dto: UpdateTimetablePeriod): Observable<TimetablePeriod> {
+    return this.http.put<TimetablePeriod>(`${this.apiBaseUrl}/academics/timetable/${periodId}`, dto);
+  }
+
+  deleteTimetablePeriod(periodId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academics/timetable/${periodId}`);
   }
 
   loadExaminationsDashboard(examTermId: number | null, classId: number | null, sectionId: number | null): void {
@@ -169,6 +322,30 @@ export class AppDataStore {
     });
   }
 
+  createExamTerm(dto: CreateExamTerm): Observable<ExamTerm> {
+    return this.http.post<ExamTerm>(`${this.apiBaseUrl}/examinations/terms`, dto);
+  }
+
+  updateExamTerm(examTermId: number, dto: UpdateExamTerm): Observable<ExamTerm> {
+    return this.http.put<ExamTerm>(`${this.apiBaseUrl}/examinations/terms/${examTermId}`, dto);
+  }
+
+  deleteExamTerm(examTermId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/examinations/terms/${examTermId}`);
+  }
+
+  createExamSchedule(dto: CreateExamSchedule): Observable<ExamSchedule> {
+    return this.http.post<ExamSchedule>(`${this.apiBaseUrl}/examinations/schedule`, dto);
+  }
+
+  updateExamSchedule(examScheduleId: number, dto: UpdateExamSchedule): Observable<ExamSchedule> {
+    return this.http.put<ExamSchedule>(`${this.apiBaseUrl}/examinations/schedule/${examScheduleId}`, dto);
+  }
+
+  deleteExamSchedule(examScheduleId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/examinations/schedule/${examScheduleId}`);
+  }
+
   loadHomeworkDashboard(classId: number | null, sectionId: number | null): void {
     const query = this.buildClassSectionQuery(classId, sectionId);
 
@@ -179,12 +356,121 @@ export class AppDataStore {
     });
   }
 
+  createHomeworkAssignment(dto: CreateHomeworkAssignment): Observable<HomeworkAssignment> {
+    return this.http.post<HomeworkAssignment>(`${this.apiBaseUrl}/homework/assignments`, dto);
+  }
+
+  updateHomeworkAssignment(homeworkAssignmentId: number, dto: UpdateHomeworkAssignment): Observable<HomeworkAssignment> {
+    return this.http.put<HomeworkAssignment>(`${this.apiBaseUrl}/homework/assignments/${homeworkAssignmentId}`, dto);
+  }
+
+  deleteHomeworkAssignment(homeworkAssignmentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/homework/assignments/${homeworkAssignmentId}`);
+  }
+
+  updateHomeworkSubmission(dto: UpdateHomeworkSubmission): Observable<StudentHomeworkProgress> {
+    return this.http.put<StudentHomeworkProgress>(`${this.apiBaseUrl}/homework/progress`, dto);
+  }
+
   loadParentPortal(studentId: number | null): void {
     const query = studentId ? `?studentId=${studentId}` : '';
 
     this.http.get<ParentPortalDashboard>(`${this.apiBaseUrl}/parent-portal/dashboard${query}`).subscribe({
       next: (dashboard) => {
         this.parentPortalDashboard.set(dashboard);
+      }
+    });
+  }
+
+  loadTransportDashboard(): void {
+    this.fetchTransportModule().subscribe({
+      next: (payload) => {
+        this.transportDashboard.set(payload.dashboard);
+        this.transportRoutes.set(payload.routes);
+        this.transportVehicles.set(payload.vehicles);
+      },
+      error: (err) => {
+        console.error('Failed to load transport dashboard', err);
+      }
+    });
+  }
+
+  createTransportRoute(dto: CreateTransportRoute): Observable<TransportRoute> {
+    return this.http.post<TransportRoute>(`${this.apiBaseUrl}/transport/routes`, dto);
+  }
+
+  updateTransportRoute(routeId: number, dto: UpdateTransportRoute): Observable<TransportRoute> {
+    return this.http.put<TransportRoute>(`${this.apiBaseUrl}/transport/routes/${routeId}`, dto);
+  }
+
+  deleteTransportRoute(routeId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/transport/routes/${routeId}`);
+  }
+
+  createTransportVehicle(dto: CreateTransportVehicle): Observable<TransportVehicle> {
+    return this.http.post<TransportVehicle>(`${this.apiBaseUrl}/transport/vehicles`, dto);
+  }
+
+  updateTransportVehicle(vehicleId: number, dto: UpdateTransportVehicle): Observable<TransportVehicle> {
+    return this.http.put<TransportVehicle>(`${this.apiBaseUrl}/transport/vehicles/${vehicleId}`, dto);
+  }
+
+  deleteTransportVehicle(vehicleId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/transport/vehicles/${vehicleId}`);
+  }
+
+  createAdmissionApplication(dto: CreateAdmissionApplication): Observable<number> {
+    return this.http.post<number>(`${this.apiBaseUrl}/admissions/applications`, dto);
+  }
+
+  updateAdmissionApplicationStatus(applicationId: number, status: string): Observable<void> {
+    return this.http.put<void>(`${this.apiBaseUrl}/admissions/applications/${applicationId}/status`, { status });
+  }
+
+  loadAdmissionsDashboard(): void {
+    this.fetchAdmissionsModule().subscribe({
+      next: (payload) => {
+        this.admissionsDashboard.set(payload.dashboard);
+        this.admissionApplications.set(payload.applications);
+        this.admissionGuardians.set(payload.guardians);
+      },
+      error: (err) => {
+        console.error('Failed to load admissions dashboard', err);
+      }
+    });
+  }
+
+  recordFeePayment(dto: RecordFeePayment): Observable<number> {
+    return this.http.post<number>(`${this.apiBaseUrl}/fees/payments`, dto);
+  }
+
+  updateFeePayment(paymentId: number, dto: UpdateFeePayment): Observable<void> {
+    return this.http.put<void>(`${this.apiBaseUrl}/fees/payments/${paymentId}`, dto);
+  }
+
+  createFeeConcession(dto: CreateFeeConcession): Observable<number> {
+    return this.http.post<number>(`${this.apiBaseUrl}/fees/concessions`, dto);
+  }
+
+  approveFeeConcession(concessionId: number, approvedBy: string): Observable<void> {
+    return this.http.put<void>(`${this.apiBaseUrl}/fees/concessions/${concessionId}/approve`, { approvedBy });
+  }
+
+  generateFeeReceipt(paymentId: number): Observable<FeeReceipt> {
+    return this.http.get<FeeReceipt>(`${this.apiBaseUrl}/fees/receipts/${paymentId}`);
+  }
+
+  loadFeesDashboard(): void {
+    this.fetchFeesModule().subscribe({
+      next: (payload) => {
+        this.feesDashboard.set(payload.dashboard);
+        this.feeStructures.set(payload.structures);
+        this.feePayments.set(payload.payments);
+        this.feeConcessions.set(payload.concessions);
+        this.feeReceipts.set(payload.receipts);
+      },
+      error: (err) => {
+        console.error('Failed to load fees dashboard', err);
       }
     });
   }
@@ -223,10 +509,42 @@ export class AppDataStore {
     });
   }
 
+  private fetchTransportModule() {
+    return forkJoin({
+      dashboard: this.http.get<TransportDashboard>(`${this.apiBaseUrl}/transport/dashboard`),
+      routes: this.http.get<TransportRoute[]>(`${this.apiBaseUrl}/transport/routes`),
+      vehicles: this.http.get<TransportVehicle[]>(`${this.apiBaseUrl}/transport/vehicles`)
+    });
+  }
+
+  private fetchAdmissionsModule() {
+    return forkJoin({
+      dashboard: this.http.get<AdmissionsDashboard>(`${this.apiBaseUrl}/admissions/dashboard`),
+      applications: this.http.get<AdmissionApplication[]>(`${this.apiBaseUrl}/admissions/applications`),
+      guardians: this.http.get<Guardian[]>(`${this.apiBaseUrl}/admissions/guardians`)
+    });
+  }
+
+  private fetchFeesModule() {
+    return forkJoin({
+      dashboard: this.http.get<FeesDashboard>(`${this.apiBaseUrl}/fees/dashboard`),
+      structures: this.http.get<FeeStructure[]>(`${this.apiBaseUrl}/fees/structures`),
+      payments: this.http.get<FeePayment[]>(`${this.apiBaseUrl}/fees/payments`),
+      concessions: this.http.get<FeeConcession[]>(`${this.apiBaseUrl}/fees/concessions`),
+      receipts: this.http.get<FeeReceipt[]>(`${this.apiBaseUrl}/fees/receipts`)
+    });
+  }
+
   private buildWorkspaceRequest() {
     return forkJoin({
       admissionsDashboard: this.http.get<AdmissionsDashboard>(`${this.apiBaseUrl}/admissions/dashboard`),
+      admissionApplications: this.http.get<AdmissionApplication[]>(`${this.apiBaseUrl}/admissions/applications`),
+      admissionGuardians: this.http.get<Guardian[]>(`${this.apiBaseUrl}/admissions/guardians`),
       feesDashboard: this.http.get<FeesDashboard>(`${this.apiBaseUrl}/fees/dashboard`),
+      feeStructures: this.http.get<FeeStructure[]>(`${this.apiBaseUrl}/fees/structures`),
+      feePayments: this.http.get<FeePayment[]>(`${this.apiBaseUrl}/fees/payments`),
+      feeConcessions: this.http.get<FeeConcession[]>(`${this.apiBaseUrl}/fees/concessions`),
+      feeReceipts: this.http.get<FeeReceipt[]>(`${this.apiBaseUrl}/fees/receipts`),
       academicsDashboard: this.http.get<AcademicsDashboard>(`${this.apiBaseUrl}/academics/dashboard`),
       examinationsDashboard: this.http.get<ExaminationsDashboard>(`${this.apiBaseUrl}/examinations/dashboard`),
       homeworkDashboard: this.http.get<HomeworkDashboard>(`${this.apiBaseUrl}/homework/dashboard`),
@@ -236,6 +554,9 @@ export class AppDataStore {
       attendanceEntryBoard: this.http.get<AttendanceEntryBoard>(`${this.apiBaseUrl}/attendance/entry-board`),
       classAttendanceRegister: this.http.get<ClassAttendanceRegister>(`${this.apiBaseUrl}/attendance/class-register`),
       attendanceLeaveRequests: this.http.get<AttendanceLeaveRequest[]>(`${this.apiBaseUrl}/attendance/leave-requests`),
+      transportDashboard: this.http.get<TransportDashboard>(`${this.apiBaseUrl}/transport/dashboard`),
+      transportRoutes: this.http.get<TransportRoute[]>(`${this.apiBaseUrl}/transport/routes`),
+      transportVehicles: this.http.get<TransportVehicle[]>(`${this.apiBaseUrl}/transport/vehicles`),
       academicStructure: this.http.get<AcademicStructure>(`${this.apiBaseUrl}/academic-structure`),
       students: this.http.get<Student[]>(`${this.apiBaseUrl}/students`),
       studentProfiles: this.http.get<StudentProfileOverview[]>(`${this.apiBaseUrl}/students/profile-overview`),
@@ -245,7 +566,13 @@ export class AppDataStore {
 
   private applyWorkspacePayload(payload: {
     admissionsDashboard: AdmissionsDashboard;
+    admissionApplications: AdmissionApplication[];
+    admissionGuardians: Guardian[];
     feesDashboard: FeesDashboard;
+    feeStructures: FeeStructure[];
+    feePayments: FeePayment[];
+    feeConcessions: FeeConcession[];
+    feeReceipts: FeeReceipt[];
     academicsDashboard: AcademicsDashboard;
     examinationsDashboard: ExaminationsDashboard;
     homeworkDashboard: HomeworkDashboard;
@@ -255,13 +582,22 @@ export class AppDataStore {
     attendanceEntryBoard: AttendanceEntryBoard;
     classAttendanceRegister: ClassAttendanceRegister;
     attendanceLeaveRequests: AttendanceLeaveRequest[];
+    transportDashboard: TransportDashboard;
+    transportRoutes: TransportRoute[];
+    transportVehicles: TransportVehicle[];
     academicStructure: AcademicStructure;
     students: Student[];
     studentProfiles: StudentProfileOverview[];
     studentDocuments: StudentDocument[];
   }): void {
     this.admissionsDashboard.set(payload.admissionsDashboard);
+    this.admissionApplications.set(payload.admissionApplications);
+    this.admissionGuardians.set(payload.admissionGuardians);
     this.feesDashboard.set(payload.feesDashboard);
+    this.feeStructures.set(payload.feeStructures);
+    this.feePayments.set(payload.feePayments);
+    this.feeConcessions.set(payload.feeConcessions);
+    this.feeReceipts.set(payload.feeReceipts);
     this.academicsDashboard.set(payload.academicsDashboard);
     this.examinationsDashboard.set(payload.examinationsDashboard);
     this.homeworkDashboard.set(payload.homeworkDashboard);
@@ -271,6 +607,9 @@ export class AppDataStore {
     this.attendanceEntryBoard.set(payload.attendanceEntryBoard);
     this.classAttendanceRegister.set(payload.classAttendanceRegister);
     this.attendanceLeaveRequests.set(payload.attendanceLeaveRequests);
+    this.transportDashboard.set(payload.transportDashboard);
+    this.transportRoutes.set(payload.transportRoutes);
+    this.transportVehicles.set(payload.transportVehicles);
     this.academicStructure.set(payload.academicStructure);
     this.students.set(payload.students);
     this.studentProfiles.set(payload.studentProfiles);

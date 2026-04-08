@@ -11,8 +11,43 @@ internal sealed class ExaminationsService(EducationErpDbContext dbContext) : IEx
         return await dbContext.ExamTerms
             .AsNoTracking()
             .OrderByDescending(term => term.StartDate)
-            .Select(term => new ExamTermDto(term.Id, term.Name, term.ExamType, term.StartDate, term.EndDate, term.Status))
+            .Select(term => MapTerm(term))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ExamTermDto> CreateExamTermAsync(CreateExamTermDto dto, CancellationToken cancellationToken = default)
+    {
+        var term = new Domain.Entities.ExamTerm(dto.CampusId, dto.AcademicYearId, dto.Name, dto.ExamType, dto.StartDate, dto.EndDate, dto.Status);
+        dbContext.ExamTerms.Add(term);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return MapTerm(term);
+    }
+
+    public async Task<ExamTermDto> UpdateExamTermAsync(int examTermId, UpdateExamTermDto dto, CancellationToken cancellationToken = default)
+    {
+        var term = await dbContext.ExamTerms.FirstOrDefaultAsync(item => item.Id == examTermId, cancellationToken);
+        if (term is null)
+        {
+            throw new InvalidOperationException("Exam term not found.");
+        }
+
+        term.UpdateDetails(dto.CampusId, dto.AcademicYearId, dto.Name, dto.ExamType, dto.StartDate, dto.EndDate, dto.Status);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return MapTerm(term);
+    }
+
+    public async Task DeleteExamTermAsync(int examTermId, CancellationToken cancellationToken = default)
+    {
+        var term = await dbContext.ExamTerms.FirstOrDefaultAsync(item => item.Id == examTermId, cancellationToken);
+        if (term is null)
+        {
+            throw new InvalidOperationException("Exam term not found.");
+        }
+
+        dbContext.ExamTerms.Remove(term);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<ExamScheduleDto>> GetExamScheduleAsync(int? examTermId = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default)
@@ -28,22 +63,45 @@ internal sealed class ExaminationsService(EducationErpDbContext dbContext) : IEx
             .Where(schedule => schedule.ExamTermId == context.ExamTermId && schedule.SchoolClassId == context.ClassId && schedule.SectionId == context.SectionId)
             .OrderBy(schedule => schedule.ExamDate)
             .ThenBy(schedule => schedule.StartTime)
-            .Select(schedule => new ExamScheduleDto(
-                schedule.Id,
-                schedule.ExamTermId,
-                schedule.ExamTerm!.Name,
-                schedule.SchoolClassId,
-                schedule.SchoolClass!.Name,
-                schedule.SectionId,
-                schedule.Section!.Name,
-                schedule.SubjectId,
-                schedule.Subject!.Name,
-                schedule.ExamDate,
-                schedule.StartTime,
-                schedule.DurationMinutes,
-                schedule.MaxMarks,
-                schedule.PassMarks))
+            .Select(schedule => MapSchedule(schedule))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<ExamScheduleDto> CreateExamScheduleAsync(CreateExamScheduleDto dto, CancellationToken cancellationToken = default)
+    {
+        var schedule = new Domain.Entities.ExamSchedule(dto.ExamTermId, dto.ClassId, dto.SectionId, dto.SubjectId, dto.ExamDate, dto.StartTime, dto.DurationMinutes, dto.MaxMarks, dto.PassMarks);
+        dbContext.ExamSchedules.Add(schedule);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        await LoadScheduleReferencesAsync(schedule, cancellationToken);
+        return MapSchedule(schedule);
+    }
+
+    public async Task<ExamScheduleDto> UpdateExamScheduleAsync(int examScheduleId, UpdateExamScheduleDto dto, CancellationToken cancellationToken = default)
+    {
+        var schedule = await dbContext.ExamSchedules.FirstOrDefaultAsync(item => item.Id == examScheduleId, cancellationToken);
+        if (schedule is null)
+        {
+            throw new InvalidOperationException("Exam schedule not found.");
+        }
+
+        schedule.UpdateDetails(dto.ExamTermId, dto.ClassId, dto.SectionId, dto.SubjectId, dto.ExamDate, dto.StartTime, dto.DurationMinutes, dto.MaxMarks, dto.PassMarks);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        await LoadScheduleReferencesAsync(schedule, cancellationToken);
+        return MapSchedule(schedule);
+    }
+
+    public async Task DeleteExamScheduleAsync(int examScheduleId, CancellationToken cancellationToken = default)
+    {
+        var schedule = await dbContext.ExamSchedules.FirstOrDefaultAsync(item => item.Id == examScheduleId, cancellationToken);
+        if (schedule is null)
+        {
+            throw new InvalidOperationException("Exam schedule not found.");
+        }
+
+        dbContext.ExamSchedules.Remove(schedule);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<ExaminationsDashboardDto> GetDashboardAsync(int? examTermId = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default)
@@ -147,4 +205,32 @@ internal sealed class ExaminationsService(EducationErpDbContext dbContext) : IEx
             selectedSchedule.SectionId,
             selectedSchedule.Section!.Name);
     }
+
+    private async Task LoadScheduleReferencesAsync(Domain.Entities.ExamSchedule schedule, CancellationToken cancellationToken)
+    {
+        await dbContext.Entry(schedule).Reference(item => item.ExamTerm).LoadAsync(cancellationToken);
+        await dbContext.Entry(schedule).Reference(item => item.SchoolClass).LoadAsync(cancellationToken);
+        await dbContext.Entry(schedule).Reference(item => item.Section).LoadAsync(cancellationToken);
+        await dbContext.Entry(schedule).Reference(item => item.Subject).LoadAsync(cancellationToken);
+    }
+
+    private static ExamTermDto MapTerm(Domain.Entities.ExamTerm term) =>
+        new(term.Id, term.Name, term.ExamType, term.StartDate, term.EndDate, term.Status);
+
+    private static ExamScheduleDto MapSchedule(Domain.Entities.ExamSchedule schedule) =>
+        new(
+            schedule.Id,
+            schedule.ExamTermId,
+            schedule.ExamTerm!.Name,
+            schedule.SchoolClassId,
+            schedule.SchoolClass!.Name,
+            schedule.SectionId,
+            schedule.Section!.Name,
+            schedule.SubjectId,
+            schedule.Subject!.Name,
+            schedule.ExamDate,
+            schedule.StartTime,
+            schedule.DurationMinutes,
+            schedule.MaxMarks,
+            schedule.PassMarks);
 }

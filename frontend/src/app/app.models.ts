@@ -1,4 +1,5 @@
 export interface AcademicStructure {
+  campuses: Campus[];
   academicYears: AcademicYear[];
   classes: SchoolClass[];
   sections: Section[];
@@ -73,6 +74,28 @@ export interface HomeworkAssignment {
   assignedBy: string;
 }
 
+export interface CreateHomeworkAssignment {
+  classId: number;
+  sectionId: number;
+  subjectId: number;
+  assignedOn: string;
+  dueOn: string;
+  title: string;
+  instructions: string;
+  assignedBy: string;
+}
+
+export interface UpdateHomeworkAssignment {
+  classId: number;
+  sectionId: number;
+  subjectId: number;
+  assignedOn: string;
+  dueOn: string;
+  title: string;
+  instructions: string;
+  assignedBy: string;
+}
+
 export interface StudentHomeworkProgress {
   homeworkAssignmentId: number;
   studentId: number;
@@ -80,6 +103,14 @@ export interface StudentHomeworkProgress {
   admissionNumber: string;
   homeworkTitle: string;
   dueOn: string;
+  status: string;
+  submittedOn: string | null;
+  remarks: string | null;
+}
+
+export interface UpdateHomeworkSubmission {
+  homeworkAssignmentId: number;
+  studentId: number;
   status: string;
   submittedOn: string | null;
   remarks: string | null;
@@ -139,6 +170,26 @@ export interface ExamTerm {
   status: string;
 }
 
+export interface CreateExamTerm {
+  campusId: number;
+  academicYearId: number;
+  name: string;
+  examType: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
+export interface UpdateExamTerm {
+  campusId: number;
+  academicYearId: number;
+  name: string;
+  examType: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
 export interface ExamSchedule {
   id: number;
   examTermId: number;
@@ -149,6 +200,30 @@ export interface ExamSchedule {
   sectionName: string;
   subjectId: number;
   subjectName: string;
+  examDate: string;
+  startTime: string;
+  durationMinutes: number;
+  maxMarks: number;
+  passMarks: number;
+}
+
+export interface CreateExamSchedule {
+  examTermId: number;
+  classId: number;
+  sectionId: number;
+  subjectId: number;
+  examDate: string;
+  startTime: string;
+  durationMinutes: number;
+  maxMarks: number;
+  passMarks: number;
+}
+
+export interface UpdateExamSchedule {
+  examTermId: number;
+  classId: number;
+  sectionId: number;
+  subjectId: number;
   examDate: string;
   startTime: string;
   durationMinutes: number;
@@ -187,6 +262,47 @@ export interface Subject {
   weeklyPeriods: number;
 }
 
+export interface CreateSubject {
+  campusId: number;
+  code: string;
+  name: string;
+  category: string;
+  weeklyPeriods: number;
+}
+
+export interface UpdateSubject {
+  code: string;
+  name: string;
+  category: string;
+  weeklyPeriods: number;
+}
+
+export interface CreateTimetablePeriod {
+  academicYearId: number;
+  classId: number;
+  sectionId: number;
+  subjectId: number;
+  dayOfWeek: string;
+  periodNumber: number;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+  roomNumber: string;
+}
+
+export interface UpdateTimetablePeriod {
+  academicYearId: number;
+  classId: number;
+  sectionId: number;
+  subjectId: number;
+  dayOfWeek: string;
+  periodNumber: number;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+  roomNumber: string;
+}
+
 export interface TimetableDay {
   dayOfWeek: string;
   periods: TimetablePeriod[];
@@ -209,8 +325,52 @@ export interface TimetablePeriod {
   roomNumber: string;
 }
 
+export interface Campus {
+  id: number;
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
+  boardAffiliation: string;
+}
+
+export interface CreateCampus {
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
+  boardAffiliation: string;
+}
+
+export interface UpdateCampus {
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
+  boardAffiliation: string;
+}
+
 export interface AcademicYear {
   id: number;
+  campusId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+}
+
+export interface CreateAcademicYear {
+  campusId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+}
+
+export interface UpdateAcademicYear {
   campusId: number;
   name: string;
   startDate: string;
@@ -226,10 +386,38 @@ export interface SchoolClass {
   displayOrder: number;
 }
 
+export interface CreateSchoolClass {
+  campusId: number;
+  code: string;
+  name: string;
+  displayOrder: number;
+}
+
+export interface UpdateSchoolClass {
+  campusId: number;
+  code: string;
+  name: string;
+  displayOrder: number;
+}
+
 export interface Section {
   id: number;
   schoolClassId: number;
   schoolClassName: string;
+  name: string;
+  capacity: number;
+  roomNumber: string;
+}
+
+export interface CreateSection {
+  schoolClassId: number;
+  name: string;
+  capacity: number;
+  roomNumber: string;
+}
+
+export interface UpdateSection {
+  schoolClassId: number;
   name: string;
   capacity: number;
   roomNumber: string;
@@ -268,6 +456,19 @@ export interface Guardian {
   email: string;
   occupation: string;
   campusName: string;
+}
+
+export interface CreateAdmissionApplication {
+  campusId: number;
+  academicYearId: number;
+  schoolClassId: number;
+  sectionId: number;
+  guardianId: number;
+  studentFirstName: string;
+  studentLastName: string;
+  dateOfBirth: string;
+  gender: string;
+  registrationFee: number;
 }
 
 export interface Student {
@@ -349,6 +550,18 @@ export interface FeePayment {
   status: string;
 }
 
+export interface FeeConcession {
+  id: number;
+  studentName: string;
+  admissionNumber: string;
+  feeName: string;
+  concessionType: string;
+  amount: number;
+  approvedOn: string;
+  approvedBy: string;
+  remarks: string | null;
+}
+
 export interface FeesDashboard {
   totalExpectedAmount: number;
   totalConcessionAmount: number;
@@ -371,6 +584,86 @@ export interface FeeReceipt {
   amount: number;
   paymentMethod: string;
   status: string;
+}
+
+export interface RecordFeePayment {
+  studentFeeId: number;
+  amount: number;
+  paymentMethod: string;
+  paymentReference: string;
+  paidOn: string;
+}
+
+export interface UpdateFeePayment {
+  amount: number;
+  paymentMethod: string;
+  paymentReference: string;
+  paidOn: string;
+}
+
+export interface CreateFeeConcession {
+  studentFeeId: number;
+  concessionType: string;
+  amount: number;
+  remarks: string;
+}
+
+export interface TransportRoute {
+  id: number;
+  routeName: string;
+  origin: string;
+  destination: string;
+  assignedVehicles: number;
+  activeTrips: number;
+  status: string;
+}
+
+export interface TransportVehicle {
+  id: number;
+  vehicleNumber: string;
+  vehicleType: string;
+  capacity: number;
+  assignedRoute: string;
+  status: string;
+}
+
+export interface CreateTransportRoute {
+  routeName: string;
+  origin: string;
+  destination: string;
+  status: string;
+}
+
+export interface UpdateTransportRoute {
+  routeName: string;
+  origin: string;
+  destination: string;
+  status: string;
+}
+
+export interface CreateTransportVehicle {
+  vehicleNumber: string;
+  vehicleType: string;
+  capacity: number;
+  assignedRouteId: number;
+  status: string;
+}
+
+export interface UpdateTransportVehicle {
+  vehicleNumber: string;
+  vehicleType: string;
+  capacity: number;
+  assignedRouteId: number;
+  status: string;
+}
+
+export interface TransportDashboard {
+  totalRoutes: number;
+  totalVehicles: number;
+  activeTrips: number;
+  capacityUtilizationPercentage: number;
+  routes: TransportRoute[];
+  vehicles: TransportVehicle[];
 }
 
 export interface AttendanceRecord {
@@ -473,6 +766,13 @@ export interface AttendanceLeaveRequest {
   leaveType: string;
   reason: string;
   status: string;
+}
+
+export interface CreateAttendanceLeaveRequest {
+  studentId: number;
+  leaveDate: string;
+  leaveType: string;
+  reason: string;
 }
 
 export interface ClassRegisterRow {

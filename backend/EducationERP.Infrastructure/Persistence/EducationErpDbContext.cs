@@ -27,6 +27,8 @@ public sealed class EducationErpDbContext(DbContextOptions<EducationErpDbContext
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
     public DbSet<SchoolHoliday> SchoolHolidays => Set<SchoolHoliday>();
     public DbSet<StudentLeaveRequest> StudentLeaveRequests => Set<StudentLeaveRequest>();
+    public DbSet<TransportRoute> TransportRoutes => Set<TransportRoute>();
+    public DbSet<TransportVehicle> TransportVehicles => Set<TransportVehicle>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

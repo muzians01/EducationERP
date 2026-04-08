@@ -1,11 +1,12 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { AppDataStore } from '../app.data';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   template: `
     <section class="hero">
       <div class="hero__content">
@@ -57,6 +58,20 @@ import { AppDataStore } from '../app.data';
         </div>
 
         <div class="workspace-grid">
+          <article class="data-card">
+            <div class="data-card__header">
+              <div>
+                <p class="eyebrow">Modules</p>
+                <h3>Open a workspace directly</h3>
+              </div>
+            </div>
+            <div class="form-actions">
+              @for (module of moduleLinks; track module.path) {
+                <a class="button button--secondary" [routerLink]="module.path">{{ module.label }}</a>
+              }
+            </div>
+          </article>
+
           <article class="data-card">
             <div class="data-card__header">
               <div>
@@ -146,6 +161,17 @@ import { AppDataStore } from '../app.data';
 export class DashboardPageComponent {
   protected readonly store = inject(AppDataStore);
   protected readonly statusTone = (status: string) => status.toLowerCase().replace(/\s+/g, '-');
+  protected readonly moduleLinks = [
+    { label: 'Master Data', path: '/master-data' },
+    { label: 'Admissions', path: '/admissions' },
+    { label: 'Academics', path: '/academics' },
+    { label: 'Examinations', path: '/examinations' },
+    { label: 'Homework', path: '/homework' },
+    { label: 'Fees', path: '/fees' },
+    { label: 'Attendance', path: '/attendance' },
+    { label: 'Transport', path: '/transport' },
+    { label: 'Parent Portal', path: '/parent-portal' }
+  ];
   protected readonly focusAreas = [
     { step: 'Admissions pulse', summary: 'Track new, approved, and waiting applications.' },
     { step: 'Collections watch', summary: 'See what was collected and what is still pending.' },
@@ -163,6 +189,7 @@ export class DashboardPageComponent {
       { label: 'Outstanding Fees', value: fees ? `Rs ${fees.outstandingAmount}` : '--', description: 'Net amount still awaiting collection.' },
       { label: 'Attendance Today', value: attendance?.totalStudentsMarked.toString() ?? '--', description: 'Rows captured in the latest attendance session.' },
       { label: 'Monthly Attendance', value: report ? `${report.overallAttendancePercentage}%` : '--', description: 'Overall trend for the latest month.' },
+      { label: 'Active Routes', value: this.store.transportDashboard()?.totalRoutes.toString() ?? '--', description: 'Transport routes currently configured.' },
       { label: 'Pending Docs', value: this.store.pendingDocumentsCount().toString(), description: 'Student documents waiting to be cleared.' }
     ];
   });

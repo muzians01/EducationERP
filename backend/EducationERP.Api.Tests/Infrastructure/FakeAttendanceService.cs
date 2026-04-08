@@ -4,6 +4,12 @@ namespace EducationERP.Api.Tests.Infrastructure;
 
 internal sealed class FakeAttendanceService : IAttendanceService
 {
+    private readonly List<AttendanceRecordDto> _records =
+    [
+        new AttendanceRecordDto(1, "Ishita Verma", "STU-2026-001", "Grade 1", "B", new DateOnly(2026, 4, 3), "Absent", new DateTime(2026, 4, 3, 8, 30, 0, DateTimeKind.Local), "Parent informed class teacher"),
+        new AttendanceRecordDto(2, "Ishita Verma", "STU-2026-001", "Grade 1", "B", new DateOnly(2026, 4, 2), "Late", new DateTime(2026, 4, 2, 8, 20, 0, DateTimeKind.Local), "Arrived after assembly")
+    ];
+
     private readonly List<AttendanceEntryStudentDto> _grade1SectionBStudents =
     [
         new AttendanceEntryStudentDto(1, "Ishita Verma", "STU-2026-001", "Absent", true, "Sick Leave", "Fever and rest advised")
@@ -15,15 +21,7 @@ internal sealed class FakeAttendanceService : IAttendanceService
     ];
 
     public Task<IReadOnlyList<AttendanceRecordDto>> GetAttendanceRecordsAsync(CancellationToken cancellationToken = default)
-    {
-        IReadOnlyList<AttendanceRecordDto> records =
-        [
-            new AttendanceRecordDto(1, "Ishita Verma", "STU-2026-001", "Grade 1", "B", new DateOnly(2026, 4, 3), "Absent", new DateTime(2026, 4, 3, 8, 30, 0, DateTimeKind.Local), "Parent informed class teacher"),
-            new AttendanceRecordDto(2, "Ishita Verma", "STU-2026-001", "Grade 1", "B", new DateOnly(2026, 4, 2), "Late", new DateTime(2026, 4, 2, 8, 20, 0, DateTimeKind.Local), "Arrived after assembly")
-        ];
-
-        return Task.FromResult(records);
-    }
+        => Task.FromResult<IReadOnlyList<AttendanceRecordDto>>(_records.ToList());
 
     public Task<IReadOnlyList<StudentAttendanceSummaryDto>> GetStudentAttendanceSummaryAsync(CancellationToken cancellationToken = default)
     {
@@ -144,6 +142,25 @@ internal sealed class FakeAttendanceService : IAttendanceService
     public Task<IReadOnlyList<AttendanceLeaveRequestDto>> GetLeaveRequestsAsync(DateOnly? attendanceDate = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default)
     {
         return Task.FromResult<IReadOnlyList<AttendanceLeaveRequestDto>>(_leaveRequests);
+    }
+
+    public Task<AttendanceLeaveRequestDto> CreateLeaveRequestAsync(CreateAttendanceLeaveRequestDto request, CancellationToken cancellationToken = default)
+    {
+        var nextId = _leaveRequests.Max(item => item.Id) + 1;
+        var leaveRequest = new AttendanceLeaveRequestDto(
+            nextId,
+            request.StudentId,
+            "Ishita Verma",
+            "STU-2026-001",
+            "Grade 1",
+            "B",
+            request.LeaveDate,
+            request.LeaveType,
+            request.Reason,
+            "Pending");
+
+        _leaveRequests.Add(leaveRequest);
+        return Task.FromResult(leaveRequest);
     }
 
     public Task<IReadOnlyList<AttendanceLeaveRequestDto>> UpdateLeaveRequestStatusAsync(int leaveRequestId, AttendanceLeaveDecisionRequestDto request, DateOnly? attendanceDate = null, int? classId = null, int? sectionId = null, CancellationToken cancellationToken = default)

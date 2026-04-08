@@ -8,6 +8,7 @@ using EducationERP.Application.Examinations;
 using EducationERP.Application.Homework;
 using EducationERP.Application.Students;
 using EducationERP.Application.ParentPortal;
+using EducationERP.Application.Transport;
 using EducationERP.Infrastructure.AcademicStructure;
 using EducationERP.Infrastructure.Academics;
 using EducationERP.Infrastructure.Admissions;
@@ -19,6 +20,7 @@ using EducationERP.Infrastructure.Homework;
 using EducationERP.Infrastructure.ParentPortal;
 using EducationERP.Infrastructure.Persistence;
 using EducationERP.Infrastructure.Students;
+using EducationERP.Infrastructure.Transport;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IHomeworkService, HomeworkService>();
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<IParentPortalService, ParentPortalService>();
+        services.AddScoped<ITransportService, TransportService>();
 
         return services;
     }

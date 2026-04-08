@@ -57,5 +57,10 @@ public sealed class AdmissionApplication : BaseEntity
     public SchoolClass? SchoolClass { get; private set; }
     public Section? Section { get; private set; }
     public Guardian? Guardian { get; private set; }
+    public void UpdateStatus(string status)
+    {
+        Status = status.Trim();
+    }
+
     public ICollection<Student> Students { get; private set; } = [];
 }

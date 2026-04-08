@@ -1,4 +1,5 @@
 using EducationERP.Application.Students;
+using EducationERP.Domain.Entities;
 using EducationERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -79,7 +80,7 @@ internal sealed class StudentService(EducationErpDbContext dbContext) : IStudent
             .ToListAsync(cancellationToken);
     }
 
-    private static int CalculateProfileCompletion(EducationERP.Domain.Entities.Student student)
+    private static int CalculateProfileCompletion(Student student)
     {
         var completedFields = 0;
         const int totalFields = 8;

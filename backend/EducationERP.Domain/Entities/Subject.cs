@@ -26,4 +26,12 @@ public sealed class Subject : BaseEntity
     public Campus? Campus { get; private set; }
     public ICollection<TimetablePeriod> TimetablePeriods { get; private set; } = [];
     public ICollection<ExamSchedule> ExamSchedules { get; private set; } = [];
+
+    public void UpdateDetails(string code, string name, string category, int weeklyPeriods)
+    {
+        Code = code.Trim().ToUpperInvariant();
+        Name = name.Trim();
+        Category = category.Trim();
+        WeeklyPeriods = weeklyPeriods;
+    }
 }

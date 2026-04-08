@@ -34,6 +34,14 @@ public sealed class FeePayment : BaseEntity
     public string PaymentMethod { get; private set; } = string.Empty;
     public string Status { get; private set; } = string.Empty;
 
+    public void UpdatePayment(decimal amount, string paymentMethod, string paymentReference, DateOnly paidOn)
+    {
+        Amount = amount;
+        PaymentMethod = paymentMethod.Trim();
+        PaymentReference = paymentReference.Trim().ToUpperInvariant();
+        PaidOn = paidOn;
+    }
+
     public Student? Student { get; private set; }
     public StudentFee? StudentFee { get; private set; }
 }

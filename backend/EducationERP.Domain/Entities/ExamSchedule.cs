@@ -45,4 +45,26 @@ public sealed class ExamSchedule : BaseEntity
     public Section? Section { get; private set; }
     public Subject? Subject { get; private set; }
     public ICollection<StudentExamScore> StudentExamScores { get; private set; } = [];
+
+    public void UpdateDetails(
+        int examTermId,
+        int schoolClassId,
+        int sectionId,
+        int subjectId,
+        DateOnly examDate,
+        TimeOnly startTime,
+        int durationMinutes,
+        int maxMarks,
+        int passMarks)
+    {
+        ExamTermId = examTermId;
+        SchoolClassId = schoolClassId;
+        SectionId = sectionId;
+        SubjectId = subjectId;
+        ExamDate = examDate;
+        StartTime = startTime;
+        DurationMinutes = durationMinutes;
+        MaxMarks = maxMarks;
+        PassMarks = passMarks;
+    }
 }

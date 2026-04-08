@@ -31,5 +31,10 @@ public sealed class FeeConcession : BaseEntity
     public string ApprovedBy { get; private set; } = string.Empty;
     public string? Remarks { get; private set; }
 
+    public void UpdateApprovedBy(string approvedBy)
+    {
+        ApprovedBy = approvedBy.Trim();
+    }
+
     public StudentFee? StudentFee { get; private set; }
 }

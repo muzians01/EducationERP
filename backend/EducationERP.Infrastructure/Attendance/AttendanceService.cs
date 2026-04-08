@@ -434,6 +434,38 @@ internal sealed class AttendanceService(EducationErpDbContext dbContext) : IAtte
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<AttendanceLeaveRequestDto> CreateLeaveRequestAsync(CreateAttendanceLeaveRequestDto request, CancellationToken cancellationToken = default)
+    {
+        var student = await dbContext.Students
+            .AsNoTracking()
+            .Include(item => item.SchoolClass)
+            .Include(item => item.Section)
+            .FirstOrDefaultAsync(item => item.Id == request.StudentId, cancellationToken);
+
+        if (student is null)
+        {
+            throw new InvalidOperationException("Student could not be found.");
+        }
+
+        var existingRequest = await dbContext.StudentLeaveRequests
+            .FirstOrDefaultAsync(item => item.StudentId == request.StudentId && item.LeaveDate == request.LeaveDate, cancellationToken);
+
+        if (existingRequest is not null)
+        {
+            existingRequest.UpdateDetails(request.LeaveDate, request.LeaveType, request.Reason);
+            existingRequest.UpdateStatus("Pending");
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return MapLeaveRequest(existingRequest.Id, student, request.LeaveDate, request.LeaveType, request.Reason, existingRequest.Status);
+        }
+
+        var leaveRequest = new StudentLeaveRequest(request.StudentId, request.LeaveDate, request.LeaveType, request.Reason, "Pending");
+        dbContext.StudentLeaveRequests.Add(leaveRequest);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return MapLeaveRequest(leaveRequest.Id, student, leaveRequest.LeaveDate, leaveRequest.LeaveType, leaveRequest.Reason, leaveRequest.Status);
+    }
+
     public async Task<IReadOnlyList<AttendanceLeaveRequestDto>> UpdateLeaveRequestStatusAsync(
         int leaveRequestId,
         AttendanceLeaveDecisionRequestDto request,
@@ -466,6 +498,19 @@ internal sealed class AttendanceService(EducationErpDbContext dbContext) : IAtte
 
         return await GetLeaveRequestsAsync(attendanceDate ?? leaveRequest.LeaveDate, classId ?? leaveRequest.Student!.SchoolClassId, sectionId ?? leaveRequest.Student!.SectionId, cancellationToken);
     }
+
+    private static AttendanceLeaveRequestDto MapLeaveRequest(int id, Student student, DateOnly leaveDate, string leaveType, string reason, string status) =>
+        new(
+            id,
+            student.Id,
+            $"{student.FirstName} {student.LastName}",
+            student.AdmissionNumber,
+            student.SchoolClass!.Name,
+            student.Section!.Name,
+            leaveDate,
+            leaveType,
+            reason,
+            status);
 
     private async Task<RosterContext> ResolveRosterAsync(DateOnly attendanceDate, int? classId, int? sectionId, CancellationToken cancellationToken)
     {

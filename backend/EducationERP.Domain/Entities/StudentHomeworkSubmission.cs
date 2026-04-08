@@ -30,4 +30,12 @@ public sealed class StudentHomeworkSubmission : BaseEntity
 
     public HomeworkAssignment? HomeworkAssignment { get; private set; }
     public Student? Student { get; private set; }
+
+    public void UpdateSubmission(string status, DateOnly? submittedOn, string? remarks)
+    {
+        Status = status.Trim();
+        SubmittedOn = submittedOn;
+        Remarks = remarks?.Trim();
+        Touch();
+    }
 }

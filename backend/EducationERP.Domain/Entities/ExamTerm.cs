@@ -30,4 +30,15 @@ public sealed class ExamTerm : BaseEntity
     public Campus? Campus { get; private set; }
     public AcademicYear? AcademicYear { get; private set; }
     public ICollection<ExamSchedule> ExamSchedules { get; private set; } = [];
+
+    public void UpdateDetails(int campusId, int academicYearId, string name, string examType, DateOnly startDate, DateOnly endDate, string status)
+    {
+        CampusId = campusId;
+        AcademicYearId = academicYearId;
+        Name = name.Trim();
+        ExamType = examType.Trim();
+        StartDate = startDate;
+        EndDate = endDate;
+        Status = status.Trim();
+    }
 }

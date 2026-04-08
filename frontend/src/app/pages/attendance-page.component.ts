@@ -3,7 +3,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppDataStore } from '../app.data';
-import { AttendanceEntryDraft } from '../app.models';
+import { AttendanceEntryDraft, CreateAttendanceLeaveRequest } from '../app.models';
 
 @Component({
   selector: 'app-attendance-page',
@@ -12,6 +12,29 @@ import { AttendanceEntryDraft } from '../app.models';
     <section class="section-heading">
       <p class="eyebrow">Attendance Module</p>
       <h2>Daily marking, leave desk, and section register</h2>
+    </section>
+
+    <section class="metrics">
+      <article class="metric-card">
+        <span>Marked Today</span>
+        <strong>{{ store.attendanceDashboard()?.totalStudentsMarked ?? 0 }}</strong>
+        <p>Students marked in the selected roster.</p>
+      </article>
+      <article class="metric-card">
+        <span>Present</span>
+        <strong>{{ store.attendanceDashboard()?.presentCount ?? 0 }}</strong>
+        <p>Students present in the latest run.</p>
+      </article>
+      <article class="metric-card">
+        <span>Absent</span>
+        <strong>{{ store.attendanceDashboard()?.absentCount ?? 0 }}</strong>
+        <p>Students absent and needing follow-up.</p>
+      </article>
+      <article class="metric-card">
+        <span>Monthly Attendance</span>
+        <strong>{{ store.attendanceMonthlyReport()?.overallAttendancePercentage ?? 0 }}%</strong>
+        <p>Current month overall trend.</p>
+      </article>
     </section>
 
     <div class="workspace-grid">
@@ -45,7 +68,7 @@ import { AttendanceEntryDraft } from '../app.models';
                     <option [ngValue]="schoolClass.id">{{ schoolClass.name }}</option>
                   }
                 </select>
-                </label>
+              </label>
               <label class="attendance-remark-field attendance-remark-field--compact">
                 <span>Section</span>
                 <select [ngModel]="selectedSectionId()" (ngModelChange)="selectedSectionId.set($event)">
@@ -119,6 +142,47 @@ import { AttendanceEntryDraft } from '../app.models';
       <article class="data-card">
         <div class="data-card__header">
           <div>
+            <p class="eyebrow">New Leave Request</p>
+            <h3>Raise a leave entry for a student</h3>
+          </div>
+        </div>
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Student</span>
+            <select [(ngModel)]="leaveDraft.studentId" name="leaveStudentId">
+              <option [ngValue]="0">Select student</option>
+              @for (student of store.attendanceEntryBoard()?.students ?? []; track student.studentId) {
+                <option [ngValue]="student.studentId">{{ student.studentName }} · {{ student.admissionNumber }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Leave Date</span>
+            <input type="date" [(ngModel)]="leaveDraft.leaveDate" name="leaveDate" />
+          </label>
+          <label class="form-field">
+            <span>Leave Type</span>
+            <select [(ngModel)]="leaveDraft.leaveType" name="leaveType">
+              @for (type of leaveTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Reason</span>
+            <textarea [(ngModel)]="leaveDraft.reason" name="leaveReason" rows="2"></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="button" class="button button--primary" [disabled]="!canSubmitLeave() || store.isCreatingLeave()" (click)="submitLeaveRequest()">
+              {{ store.isCreatingLeave() ? 'Submitting...' : 'Submit Leave Request' }}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="data-card">
+        <div class="data-card__header">
+          <div>
             <p class="eyebrow">Leave Desk</p>
             <h3>Approve or reject leave requests</h3>
           </div>
@@ -138,6 +202,29 @@ import { AttendanceEntryDraft } from '../app.models';
             <article class="guardian-item">
               <strong>No leave requests</strong>
               <p>The selected roster has no leave requests for this day.</p>
+            </article>
+          }
+        </div>
+      </article>
+
+      <article class="data-card">
+        <div class="data-card__header">
+          <div>
+            <p class="eyebrow">Recent Records</p>
+            <h3>Latest attendance rows</h3>
+          </div>
+        </div>
+        <div class="application-list">
+          @for (record of recentRecords(); track record.id) {
+            <article class="application-item">
+              <div class="application-item__main">
+                <div>
+                  <strong>{{ record.studentName }}</strong>
+                  <p>{{ record.attendanceDate | date: 'dd MMM yyyy' }} · {{ record.admissionNumber }}</p>
+                </div>
+                <span class="status-chip" [class]="'status-chip status-chip--' + statusTone(record.status)">{{ record.status }}</span>
+              </div>
+              <p class="application-guardian">{{ record.remarks || 'No remarks recorded.' }}</p>
             </article>
           }
         </div>
@@ -245,15 +332,23 @@ import { AttendanceEntryDraft } from '../app.models';
 export class AttendancePageComponent {
   protected readonly store = inject(AppDataStore);
   protected readonly statusOptions = ['Present', 'Absent', 'Late'];
+  protected readonly leaveTypes = ['Sick Leave', 'Personal Leave', 'Emergency Leave', 'Family Event'];
   protected readonly draftEntries = signal<Record<number, AttendanceEntryDraft>>({});
   protected readonly selectedDate = signal<string>('');
   protected readonly selectedClassId = signal<number | null>(null);
   protected readonly selectedSectionId = signal<number | null>(null);
+  protected leaveDraft: CreateAttendanceLeaveRequest = {
+    studentId: 0,
+    leaveDate: '',
+    leaveType: 'Sick Leave',
+    reason: ''
+  };
   protected readonly statusTone = (status: string) => status.toLowerCase().replace(/\s+/g, '-');
   protected readonly classOptions = computed(() => this.store.academicStructure()?.classes ?? []);
   protected readonly sectionOptions = computed(() =>
     (this.store.academicStructure()?.sections ?? []).filter((section) => section.schoolClassId === this.selectedClassId())
   );
+  protected readonly recentRecords = computed(() => this.store.attendanceDashboard()?.todayRecords ?? []);
   protected readonly hasUnmarkedStudents = computed(() =>
     Object.values(this.draftEntries()).some((entry) => entry.status === 'Unmarked')
   );
@@ -281,6 +376,12 @@ export class AttendancePageComponent {
       this.selectedDate.set(board.attendanceDate);
       this.selectedClassId.set(board.classId);
       this.selectedSectionId.set(board.sectionId);
+      this.leaveDraft = {
+        studentId: board.students[0]?.studentId ?? 0,
+        leaveDate: board.attendanceDate,
+        leaveType: 'Sick Leave',
+        reason: ''
+      };
 
       const draft = board.students.reduce<Record<number, AttendanceEntryDraft>>((entries, student) => {
         entries[student.studentId] = {
@@ -355,7 +456,23 @@ export class AttendancePageComponent {
     this.store.loadAttendanceForSelection(this.selectedDate(), this.selectedClassId(), this.selectedSectionId());
   }
 
+  protected submitLeaveRequest(): void {
+    if (!this.canSubmitLeave()) {
+      return;
+    }
+
+    this.store.createLeaveRequest(this.leaveDraft);
+    this.leaveDraft = {
+      ...this.leaveDraft,
+      reason: ''
+    };
+  }
+
   protected updateLeave(leaveRequestId: number, status: string): void {
     this.store.updateLeaveStatus(leaveRequestId, status);
+  }
+
+  protected canSubmitLeave(): boolean {
+    return Boolean(this.leaveDraft.studentId && this.leaveDraft.leaveDate && this.leaveDraft.leaveType && this.leaveDraft.reason.trim());
   }
 }

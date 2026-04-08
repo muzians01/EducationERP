@@ -45,4 +45,26 @@ public sealed class HomeworkAssignment : BaseEntity
     public Section? Section { get; private set; }
     public Subject? Subject { get; private set; }
     public ICollection<StudentHomeworkSubmission> StudentSubmissions { get; private set; } = [];
+
+    public void UpdateDetails(
+        int academicYearId,
+        int schoolClassId,
+        int sectionId,
+        int subjectId,
+        DateOnly assignedOn,
+        DateOnly dueOn,
+        string title,
+        string instructions,
+        string assignedBy)
+    {
+        AcademicYearId = academicYearId;
+        SchoolClassId = schoolClassId;
+        SectionId = sectionId;
+        SubjectId = subjectId;
+        AssignedOn = assignedOn;
+        DueOn = dueOn;
+        Title = title.Trim();
+        Instructions = instructions.Trim();
+        AssignedBy = assignedBy.Trim();
+    }
 }

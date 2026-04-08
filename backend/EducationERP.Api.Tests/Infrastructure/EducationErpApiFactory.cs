@@ -8,6 +8,7 @@ using EducationERP.Application.Fees;
 using EducationERP.Application.Homework;
 using EducationERP.Application.ParentPortal;
 using EducationERP.Application.Students;
+using EducationERP.Application.Transport;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public sealed class EducationErpApiFactory : WebApplicationFactory<Program>
             services.RemoveAll<IHomeworkService>();
             services.RemoveAll<IAttendanceService>();
             services.RemoveAll<IParentPortalService>();
+            services.RemoveAll<ITransportService>();
             services.AddScoped<ICampusService, FakeCampusService>();
             services.AddScoped<IAcademicStructureService, FakeAcademicStructureService>();
             services.AddScoped<IAcademicsService, FakeAcademicsService>();
@@ -43,6 +45,7 @@ public sealed class EducationErpApiFactory : WebApplicationFactory<Program>
             services.AddScoped<IHomeworkService, FakeHomeworkService>();
             services.AddScoped<IAttendanceService, FakeAttendanceService>();
             services.AddScoped<IParentPortalService, FakeParentPortalService>();
+            services.AddScoped<ITransportService, FakeTransportService>();
         });
     }
 }

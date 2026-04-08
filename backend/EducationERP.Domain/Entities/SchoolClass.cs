@@ -16,6 +16,14 @@ public sealed class SchoolClass : BaseEntity
         DisplayOrder = displayOrder;
     }
 
+    public void UpdateDetails(int campusId, string code, string name, int displayOrder)
+    {
+        CampusId = campusId;
+        Code = code.Trim().ToUpperInvariant();
+        Name = name.Trim();
+        DisplayOrder = displayOrder;
+    }
+
     public int CampusId { get; private set; }
     public string Code { get; private set; } = string.Empty;
     public string Name { get; private set; } = string.Empty;

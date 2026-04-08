@@ -30,6 +30,14 @@ public sealed class StudentLeaveRequest : BaseEntity
 
     public Student? Student { get; private set; }
 
+    public void UpdateDetails(DateOnly leaveDate, string leaveType, string reason)
+    {
+        LeaveDate = leaveDate;
+        LeaveType = leaveType.Trim();
+        Reason = reason.Trim();
+        Touch();
+    }
+
     public void UpdateStatus(string status)
     {
         Status = status.Trim();

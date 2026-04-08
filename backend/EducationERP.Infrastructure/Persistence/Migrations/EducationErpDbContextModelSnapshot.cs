@@ -835,6 +835,110 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.HomeworkAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AcademicYearId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AssignedBy")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<DateOnly>("AssignedOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("DueOn")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<int>("SchoolClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("SchoolClassId");
+
+                    b.HasIndex("SectionId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("HomeworkAssignments", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AcademicYearId = 1,
+                            AssignedBy = "Anita Rao",
+                            AssignedOn = new DateOnly(2026, 4, 6),
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 0, 0, 0, DateTimeKind.Local),
+                            DueOn = new DateOnly(2026, 4, 8),
+                            Instructions = "Read chapter 4 and write five new vocabulary words.",
+                            SchoolClassId = 1,
+                            SectionId = 2,
+                            SubjectId = 1,
+                            Title = "Reading journal"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AcademicYearId = 1,
+                            AssignedBy = "Rahul Mehta",
+                            AssignedOn = new DateOnly(2026, 4, 6),
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 0, 0, 0, DateTimeKind.Local),
+                            DueOn = new DateOnly(2026, 4, 7),
+                            Instructions = "Complete workbook page 18 and revise skip counting.",
+                            SchoolClassId = 1,
+                            SectionId = 2,
+                            SubjectId = 2,
+                            Title = "Number patterns"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AcademicYearId = 1,
+                            AssignedBy = "Priya Nair",
+                            AssignedOn = new DateOnly(2026, 4, 5),
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 0, 0, 0, DateTimeKind.Local),
+                            DueOn = new DateOnly(2026, 4, 9),
+                            Instructions = "Observe one plant at home and note changes for three days.",
+                            SchoolClassId = 1,
+                            SectionId = 2,
+                            SubjectId = 3,
+                            Title = "Plant observation"
+                        });
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.SchoolClass", b =>
                 {
                     b.Property<int>("Id")
@@ -1408,6 +1512,79 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.StudentHomeworkSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HomeworkAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("SubmittedOn")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("HomeworkAssignmentId", "StudentId")
+                        .IsUnique();
+
+                    b.ToTable("StudentHomeworkSubmissions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 15, 0, 0, DateTimeKind.Local),
+                            HomeworkAssignmentId = 1,
+                            Remarks = "Yet to be submitted",
+                            Status = "Assigned",
+                            StudentId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 15, 0, 0, DateTimeKind.Local),
+                            HomeworkAssignmentId = 2,
+                            Remarks = "Completed neatly",
+                            Status = "Submitted",
+                            StudentId = 1,
+                            SubmittedOn = new DateOnly(2026, 4, 6)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 4, 6, 9, 15, 0, 0, DateTimeKind.Local),
+                            HomeworkAssignmentId = 3,
+                            Remarks = "Good observation detail",
+                            Status = "Reviewed",
+                            StudentId = 1,
+                            SubmittedOn = new DateOnly(2026, 4, 6)
+                        });
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.StudentLeaveRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -1742,6 +1919,151 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.TransportRoute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("RouteName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TransportRoutes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Destination = "North Campus",
+                            Origin = "Main Campus",
+                            RouteName = "North Campus Shuttle",
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Destination = "East Campus",
+                            Origin = "Main Campus",
+                            RouteName = "East Campus Express",
+                            Status = "Active"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Destination = "Main Campus",
+                            Origin = "Downtown",
+                            RouteName = "City School Link",
+                            Status = "Inactive"
+                        });
+                });
+
+            modelBuilder.Entity("EducationERP.Domain.Entities.TransportVehicle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssignedRouteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VehicleNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedRouteId");
+
+                    b.HasIndex("VehicleNumber")
+                        .IsUnique();
+
+                    b.ToTable("TransportVehicles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AssignedRouteId = 1,
+                            Capacity = 50,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Status = "On Route",
+                            VehicleNumber = "ERP-101",
+                            VehicleType = "Bus"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AssignedRouteId = 2,
+                            Capacity = 18,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Status = "On Route",
+                            VehicleNumber = "ERP-102",
+                            VehicleType = "Van"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AssignedRouteId = 3,
+                            Capacity = 52,
+                            CreatedAt = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            Status = "Idle",
+                            VehicleNumber = "ERP-103",
+                            VehicleType = "Bus"
+                        });
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.AcademicYear", b =>
                 {
                     b.HasOne("EducationERP.Domain.Entities.Campus", "Campus")
@@ -1929,6 +2251,41 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                     b.Navigation("Campus");
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.HomeworkAssignment", b =>
+                {
+                    b.HasOne("EducationERP.Domain.Entities.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EducationERP.Domain.Entities.SchoolClass", "SchoolClass")
+                        .WithMany()
+                        .HasForeignKey("SchoolClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EducationERP.Domain.Entities.Section", "Section")
+                        .WithMany()
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EducationERP.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("SchoolClass");
+
+                    b.Navigation("Section");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.SchoolClass", b =>
                 {
                     b.HasOne("EducationERP.Domain.Entities.Campus", "Campus")
@@ -2062,6 +2419,25 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.StudentHomeworkSubmission", b =>
+                {
+                    b.HasOne("EducationERP.Domain.Entities.HomeworkAssignment", "HomeworkAssignment")
+                        .WithMany("StudentSubmissions")
+                        .HasForeignKey("HomeworkAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EducationERP.Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HomeworkAssignment");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.StudentLeaveRequest", b =>
                 {
                     b.HasOne("EducationERP.Domain.Entities.Student", "Student")
@@ -2119,6 +2495,17 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.TransportVehicle", b =>
+                {
+                    b.HasOne("EducationERP.Domain.Entities.TransportRoute", "AssignedRoute")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("AssignedRouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedRoute");
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.AcademicYear", b =>
                 {
                     b.Navigation("AdmissionApplications");
@@ -2172,6 +2559,11 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                     b.Navigation("Students");
                 });
 
+            modelBuilder.Entity("EducationERP.Domain.Entities.HomeworkAssignment", b =>
+                {
+                    b.Navigation("StudentSubmissions");
+                });
+
             modelBuilder.Entity("EducationERP.Domain.Entities.SchoolClass", b =>
                 {
                     b.Navigation("AdmissionApplications");
@@ -2215,6 +2607,11 @@ namespace EducationERP.Infrastructure.Persistence.Migrations
                     b.Navigation("ExamSchedules");
 
                     b.Navigation("TimetablePeriods");
+                });
+
+            modelBuilder.Entity("EducationERP.Domain.Entities.TransportRoute", b =>
+                {
+                    b.Navigation("Vehicles");
                 });
 #pragma warning restore 612, 618
         }

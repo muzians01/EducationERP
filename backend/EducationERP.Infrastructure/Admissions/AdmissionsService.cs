@@ -1,4 +1,5 @@
 using EducationERP.Application.Admissions;
+using EducationERP.Domain.Entities;
 using EducationERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,5 +64,50 @@ internal sealed class AdmissionsService(EducationErpDbContext dbContext) : IAdmi
             applications.Sum(application => application.RegistrationFee),
             applications.Take(5).ToList(),
             guardians.Take(5).ToList());
+    }
+
+    public async Task<int> CreateApplicationAsync(CreateAdmissionApplicationDto dto, CancellationToken cancellationToken = default)
+    {
+        // Generate application number
+        var lastApplication = await dbContext.AdmissionApplications
+            .OrderByDescending(a => a.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var nextNumber = lastApplication is null ? 1 : int.Parse(lastApplication.ApplicationNumber[3..]) + 1;
+        var applicationNumber = $"ADM{nextNumber:D6}";
+
+        var application = new AdmissionApplication(
+            dto.CampusId,
+            dto.AcademicYearId,
+            dto.SchoolClassId,
+            dto.SectionId,
+            dto.GuardianId,
+            applicationNumber,
+            dto.StudentFirstName,
+            dto.StudentLastName,
+            dto.DateOfBirth,
+            dto.Gender,
+            "New",
+            DateOnly.FromDateTime(DateTime.Now),
+            dto.RegistrationFee);
+
+        dbContext.AdmissionApplications.Add(application);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return application.Id;
+    }
+
+    public async Task UpdateApplicationStatusAsync(int applicationId, string status, CancellationToken cancellationToken = default)
+    {
+        var application = await dbContext.AdmissionApplications
+            .FirstOrDefaultAsync(a => a.Id == applicationId, cancellationToken);
+
+        if (application is null)
+        {
+            throw new InvalidOperationException("Application not found.");
+        }
+
+        application.UpdateStatus(status);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

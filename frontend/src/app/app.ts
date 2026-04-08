@@ -14,12 +14,14 @@ export class App {
   protected readonly title = 'Education ERP Workspace';
   protected readonly navItems = [
     { label: 'Overview', path: '/' },
+    { label: 'Master Data', path: '/master-data' },
     { label: 'Admissions', path: '/admissions' },
     { label: 'Academics', path: '/academics' },
     { label: 'Examinations', path: '/examinations' },
     { label: 'Homework', path: '/homework' },
     { label: 'Fees', path: '/fees' },
     { label: 'Attendance', path: '/attendance' },
+    { label: 'Transport', path: '/transport' },
     { label: 'Parent Portal', path: '/parent-portal' }
   ];
   private readonly store = inject(AppDataStore);
