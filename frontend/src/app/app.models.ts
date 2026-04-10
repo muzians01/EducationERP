@@ -1,8 +1,34 @@
 export interface AcademicStructure {
+  institutions: Institution[];
   campuses: Campus[];
   academicYears: AcademicYear[];
   classes: SchoolClass[];
   sections: Section[];
+}
+
+export interface Institution {
+  id: number;
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+export interface CreateInstitution {
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+export interface UpdateInstitution {
+  code: string;
+  name: string;
+  city: string;
+  state: string;
+  country: string;
 }
 
 export interface AcademicsDashboard {
@@ -327,6 +353,8 @@ export interface TimetablePeriod {
 
 export interface Campus {
   id: number;
+  institutionId: number;
+  institutionName: string;
   code: string;
   name: string;
   city: string;
@@ -336,6 +364,7 @@ export interface Campus {
 }
 
 export interface CreateCampus {
+  institutionId: number;
   code: string;
   name: string;
   city: string;
@@ -345,6 +374,7 @@ export interface CreateCampus {
 }
 
 export interface UpdateCampus {
+  institutionId: number;
   code: string;
   name: string;
   city: string;

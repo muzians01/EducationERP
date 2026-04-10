@@ -2,6 +2,8 @@ namespace EducationERP.Application.Campuses;
 
 public sealed record CampusDto(
     int Id,
+    int InstitutionId,
+    string InstitutionName,
     string Code,
     string Name,
     string City,

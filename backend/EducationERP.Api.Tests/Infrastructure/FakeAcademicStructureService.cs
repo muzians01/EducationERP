@@ -5,9 +5,14 @@ namespace EducationERP.Api.Tests.Infrastructure;
 
 internal sealed class FakeAcademicStructureService : IAcademicStructureService
 {
+    private readonly List<InstitutionDto> _institutions =
+    [
+        new InstitutionDto(1, "TEST-TRUST", "Test Education Trust", "Bengaluru", "Karnataka", "India")
+    ];
+
     private readonly List<CampusDto> _campuses =
     [
-        new CampusDto(1, "TEST", "Test Campus", "Bengaluru", "Karnataka", "India", "CBSE")
+        new CampusDto(1, 1, "Test Education Trust", "TEST", "Test Campus", "Bengaluru", "Karnataka", "India", "CBSE")
     ];
 
     private readonly List<AcademicYearDto> _academicYears =
@@ -25,10 +30,56 @@ internal sealed class FakeAcademicStructureService : IAcademicStructureService
         new SectionDto(1, 1, "Grade 1", "A", 35, "G1-A01")
     ];
 
+    public Task<IReadOnlyList<InstitutionDto>> GetInstitutionsAsync(CancellationToken cancellationToken = default)
+        => Task.FromResult<IReadOnlyList<InstitutionDto>>(_institutions.ToList());
+
+    public Task<InstitutionDto> CreateInstitutionAsync(CreateInstitutionDto dto, CancellationToken cancellationToken = default)
+    {
+        var nextId = _institutions.Max(item => item.Id) + 1;
+        var institution = new InstitutionDto(nextId, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim());
+        _institutions.Add(institution);
+        return Task.FromResult(institution);
+    }
+
+    public Task<InstitutionDto> UpdateInstitutionAsync(int institutionId, UpdateInstitutionDto dto, CancellationToken cancellationToken = default)
+    {
+        var index = _institutions.FindIndex(item => item.Id == institutionId);
+        if (index < 0)
+        {
+            throw new InvalidOperationException("Institution not found.");
+        }
+
+        var institution = new InstitutionDto(institutionId, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim());
+        _institutions[index] = institution;
+
+        for (var campusIndex = 0; campusIndex < _campuses.Count; campusIndex++)
+        {
+            var campus = _campuses[campusIndex];
+            if (campus.InstitutionId == institutionId)
+            {
+                _campuses[campusIndex] = campus with { InstitutionName = institution.Name };
+            }
+        }
+
+        return Task.FromResult(institution);
+    }
+
+    public Task DeleteInstitutionAsync(int institutionId, CancellationToken cancellationToken = default)
+    {
+        if (_campuses.Any(item => item.InstitutionId == institutionId))
+        {
+            throw new InvalidOperationException("Institution cannot be deleted because campuses already exist under it.");
+        }
+
+        _institutions.RemoveAll(item => item.Id == institutionId);
+        return Task.CompletedTask;
+    }
+
     public Task<CampusDto> CreateCampusAsync(CreateCampusDto dto, CancellationToken cancellationToken = default)
     {
         var nextId = _campuses.Max(item => item.Id) + 1;
-        var campus = new CampusDto(nextId, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim(), dto.BoardAffiliation.Trim());
+        var institutionName = _institutions.FirstOrDefault(item => item.Id == dto.InstitutionId)?.Name ?? "Unknown Institution";
+        var campus = new CampusDto(nextId, dto.InstitutionId, institutionName, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim(), dto.BoardAffiliation.Trim());
         _campuses.Add(campus);
         return Task.FromResult(campus);
     }
@@ -41,7 +92,8 @@ internal sealed class FakeAcademicStructureService : IAcademicStructureService
             throw new InvalidOperationException("Campus not found.");
         }
 
-        var campus = new CampusDto(campusId, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim(), dto.BoardAffiliation.Trim());
+        var institutionName = _institutions.FirstOrDefault(item => item.Id == dto.InstitutionId)?.Name ?? "Unknown Institution";
+        var campus = new CampusDto(campusId, dto.InstitutionId, institutionName, dto.Code.Trim().ToUpperInvariant(), dto.Name.Trim(), dto.City.Trim(), dto.State.Trim(), dto.Country.Trim(), dto.BoardAffiliation.Trim());
         _campuses[index] = campus;
         return Task.FromResult(campus);
     }
@@ -145,5 +197,5 @@ internal sealed class FakeAcademicStructureService : IAcademicStructureService
     }
 
     public Task<AcademicStructureDto> GetAcademicStructureAsync(CancellationToken cancellationToken = default)
-        => Task.FromResult(new AcademicStructureDto(_campuses.ToList(), _academicYears.ToList(), _classes.ToList(), _sections.ToList()));
+        => Task.FromResult(new AcademicStructureDto(_institutions.ToList(), _campuses.ToList(), _academicYears.ToList(), _classes.ToList(), _sections.ToList()));
 }

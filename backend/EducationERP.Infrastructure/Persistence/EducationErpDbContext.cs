@@ -5,6 +5,7 @@ namespace EducationERP.Infrastructure.Persistence;
 
 public sealed class EducationErpDbContext(DbContextOptions<EducationErpDbContext> options) : DbContext(options)
 {
+    public DbSet<Institution> Institutions => Set<Institution>();
     public DbSet<Campus> Campuses => Set<Campus>();
     public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
     public DbSet<Subject> Subjects => Set<Subject>();

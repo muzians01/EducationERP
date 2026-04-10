@@ -10,6 +10,8 @@ internal sealed class FakeCampusService : ICampusService
         [
             new CampusDto(
                 1,
+                1,
+                "Test Education Trust",
                 "TEST",
                 "Test Campus",
                 "Bengaluru",

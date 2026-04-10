@@ -13,6 +13,7 @@ using EducationERP.Application.ParentPortal;
 using EducationERP.Application.Students;
 using EducationERP.Application.Transport;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace EducationERP.Api.Tests.Endpoints;
@@ -54,6 +55,7 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         Assert.NotNull(campuses);
         Assert.Single(campuses);
         Assert.Equal("Test Campus", campuses[0].Name);
+        Assert.Equal("Test Education Trust", campuses[0].InstitutionName);
     }
 
     [Fact]
@@ -62,18 +64,40 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         var structure = await _client.GetFromJsonAsync<AcademicStructureDto>("/api/academic-structure");
 
         Assert.NotNull(structure);
+        Assert.Single(structure.Institutions);
         Assert.Single(structure.AcademicYears);
         Assert.Single(structure.Classes);
         Assert.Single(structure.Sections);
+        Assert.Equal("Test Education Trust", structure.Institutions[0].Name);
         Assert.Equal("2026-2027", structure.AcademicYears[0].Name);
         Assert.Equal("Grade 1", structure.Classes[0].Name);
         Assert.Equal("A", structure.Sections[0].Name);
     }
 
     [Fact]
+    public async Task InstitutionCreationEndpoint_CreatesInstitution()
+    {
+        var response = await _client.PostAsJsonAsync("/api/academic-structure/institutions", new CreateInstitutionDto(
+            "NORTH-TRUST",
+            "North Education Trust",
+            "Mysuru",
+            "Karnataka",
+            "India"));
+
+        response.EnsureSuccessStatusCode();
+
+        var institution = await response.Content.ReadFromJsonAsync<InstitutionDto>();
+
+        Assert.NotNull(institution);
+        Assert.Equal("NORTH-TRUST", institution.Code);
+        Assert.Equal("North Education Trust", institution.Name);
+    }
+
+    [Fact]
     public async Task CampusCreationEndpoint_CreatesCampus()
     {
         var response = await _client.PostAsJsonAsync("/api/campuses", new CreateCampusDto(
+            1,
             "NORTH",
             "North Campus",
             "Mysuru",
@@ -86,6 +110,7 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         var campus = await response.Content.ReadFromJsonAsync<CampusDto>();
 
         Assert.NotNull(campus);
+        Assert.Equal(1, campus.InstitutionId);
         Assert.Equal("NORTH", campus.Code);
         Assert.Equal("North Campus", campus.Name);
     }
@@ -143,6 +168,45 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         Assert.NotNull(section);
         Assert.Equal("B", section.Name);
         Assert.Equal(40, section.Capacity);
+    }
+
+    [Fact]
+    public async Task CampusUpdateEndpoint_ReturnsValidationProblem_WhenCampusDoesNotExist()
+    {
+        var response = await _client.PutAsJsonAsync("/api/campuses/999", new UpdateCampusDto(
+            1,
+            "UNKNOWN",
+            "Unknown Campus",
+            "Bengaluru",
+            "Karnataka",
+            "India",
+            "CBSE"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("masterData", payload.Errors.Keys);
+        Assert.Contains("Campus not found.", payload.Errors["masterData"]);
+    }
+
+    [Fact]
+    public async Task SectionUpdateEndpoint_ReturnsValidationProblem_WhenSectionDoesNotExist()
+    {
+        var response = await _client.PutAsJsonAsync("/api/academic-structure/sections/999", new UpdateSectionDto(
+            1,
+            "C",
+            30,
+            "G1-C01"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("masterData", payload.Errors.Keys);
+        Assert.Contains("Section not found.", payload.Errors["masterData"]);
     }
 
     [Fact]

@@ -80,24 +80,94 @@ app.MapGet("/api/campuses", async (ICampusService campusService, CancellationTok
 })
 .WithName("GetCampuses");
 
+app.MapGet("/api/academic-structure/institutions", async (IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
+{
+    var institutions = await academicStructureService.GetInstitutionsAsync(cancellationToken);
+    return Results.Ok(institutions);
+})
+.WithName("GetInstitutions");
+
+app.MapPost("/api/academic-structure/institutions", async (CreateInstitutionDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var institution = await academicStructureService.CreateInstitutionAsync(dto, cancellationToken);
+        return Results.Created($"/api/academic-structure/institutions/{institution.Id}", institution);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
+})
+.WithName("CreateInstitution");
+
+app.MapPut("/api/academic-structure/institutions/{institutionId}", async (int institutionId, UpdateInstitutionDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var institution = await academicStructureService.UpdateInstitutionAsync(institutionId, dto, cancellationToken);
+        return Results.Ok(institution);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
+})
+.WithName("UpdateInstitution");
+
+app.MapDelete("/api/academic-structure/institutions/{institutionId}", async (int institutionId, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        await academicStructureService.DeleteInstitutionAsync(institutionId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
+})
+.WithName("DeleteInstitution");
+
 app.MapPost("/api/campuses", async (CreateCampusDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var campus = await academicStructureService.CreateCampusAsync(dto, cancellationToken);
-    return Results.Created($"/api/campuses/{campus.Id}", campus);
+    try
+    {
+        var campus = await academicStructureService.CreateCampusAsync(dto, cancellationToken);
+        return Results.Created($"/api/campuses/{campus.Id}", campus);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("CreateCampus");
 
 app.MapPut("/api/campuses/{campusId}", async (int campusId, UpdateCampusDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var campus = await academicStructureService.UpdateCampusAsync(campusId, dto, cancellationToken);
-    return Results.Ok(campus);
+    try
+    {
+        var campus = await academicStructureService.UpdateCampusAsync(campusId, dto, cancellationToken);
+        return Results.Ok(campus);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("UpdateCampus");
 
 app.MapDelete("/api/campuses/{campusId}", async (int campusId, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    await academicStructureService.DeleteCampusAsync(campusId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicStructureService.DeleteCampusAsync(campusId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("DeleteCampus");
 
@@ -110,22 +180,43 @@ app.MapGet("/api/academic-years", async (IAcademicStructureService academicStruc
 
 app.MapPost("/api/academic-structure/academic-years", async (CreateAcademicYearDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var academicYear = await academicStructureService.CreateAcademicYearAsync(dto, cancellationToken);
-    return Results.Created($"/api/academic-structure/academic-years/{academicYear.Id}", academicYear);
+    try
+    {
+        var academicYear = await academicStructureService.CreateAcademicYearAsync(dto, cancellationToken);
+        return Results.Created($"/api/academic-structure/academic-years/{academicYear.Id}", academicYear);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("CreateAcademicYear");
 
 app.MapPut("/api/academic-structure/academic-years/{academicYearId}", async (int academicYearId, UpdateAcademicYearDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var academicYear = await academicStructureService.UpdateAcademicYearAsync(academicYearId, dto, cancellationToken);
-    return Results.Ok(academicYear);
+    try
+    {
+        var academicYear = await academicStructureService.UpdateAcademicYearAsync(academicYearId, dto, cancellationToken);
+        return Results.Ok(academicYear);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("UpdateAcademicYear");
 
 app.MapDelete("/api/academic-structure/academic-years/{academicYearId}", async (int academicYearId, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    await academicStructureService.DeleteAcademicYearAsync(academicYearId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicStructureService.DeleteAcademicYearAsync(academicYearId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("DeleteAcademicYear");
 
@@ -138,22 +229,43 @@ app.MapGet("/api/classes", async (IAcademicStructureService academicStructureSer
 
 app.MapPost("/api/academic-structure/classes", async (CreateSchoolClassDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var schoolClass = await academicStructureService.CreateSchoolClassAsync(dto, cancellationToken);
-    return Results.Created($"/api/academic-structure/classes/{schoolClass.Id}", schoolClass);
+    try
+    {
+        var schoolClass = await academicStructureService.CreateSchoolClassAsync(dto, cancellationToken);
+        return Results.Created($"/api/academic-structure/classes/{schoolClass.Id}", schoolClass);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("CreateSchoolClass");
 
 app.MapPut("/api/academic-structure/classes/{schoolClassId}", async (int schoolClassId, UpdateSchoolClassDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var schoolClass = await academicStructureService.UpdateSchoolClassAsync(schoolClassId, dto, cancellationToken);
-    return Results.Ok(schoolClass);
+    try
+    {
+        var schoolClass = await academicStructureService.UpdateSchoolClassAsync(schoolClassId, dto, cancellationToken);
+        return Results.Ok(schoolClass);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("UpdateSchoolClass");
 
 app.MapDelete("/api/academic-structure/classes/{schoolClassId}", async (int schoolClassId, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    await academicStructureService.DeleteSchoolClassAsync(schoolClassId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicStructureService.DeleteSchoolClassAsync(schoolClassId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("DeleteSchoolClass");
 
@@ -166,22 +278,43 @@ app.MapGet("/api/sections", async (IAcademicStructureService academicStructureSe
 
 app.MapPost("/api/academic-structure/sections", async (CreateSectionDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var section = await academicStructureService.CreateSectionAsync(dto, cancellationToken);
-    return Results.Created($"/api/academic-structure/sections/{section.Id}", section);
+    try
+    {
+        var section = await academicStructureService.CreateSectionAsync(dto, cancellationToken);
+        return Results.Created($"/api/academic-structure/sections/{section.Id}", section);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("CreateSection");
 
 app.MapPut("/api/academic-structure/sections/{sectionId}", async (int sectionId, UpdateSectionDto dto, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    var section = await academicStructureService.UpdateSectionAsync(sectionId, dto, cancellationToken);
-    return Results.Ok(section);
+    try
+    {
+        var section = await academicStructureService.UpdateSectionAsync(sectionId, dto, cancellationToken);
+        return Results.Ok(section);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("UpdateSection");
 
 app.MapDelete("/api/academic-structure/sections/{sectionId}", async (int sectionId, IAcademicStructureService academicStructureService, CancellationToken cancellationToken) =>
 {
-    await academicStructureService.DeleteSectionAsync(sectionId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicStructureService.DeleteSectionAsync(sectionId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateMasterDataValidationProblem(exception);
+    }
 })
 .WithName("DeleteSection");
 
@@ -753,6 +886,14 @@ app.MapPost("/api/setup/database/migrate", async (EducationErpDbContext dbContex
     return Results.Accepted("/health", new { status = "Database migrated" });
 })
 .WithName("MigrateDatabase");
+
+static IResult CreateMasterDataValidationProblem(Exception exception)
+{
+    return Results.ValidationProblem(new Dictionary<string, string[]>
+    {
+        ["masterData"] = [exception.Message]
+    });
+}
 
 app.Run();
 

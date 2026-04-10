@@ -2,7 +2,22 @@ using EducationERP.Application.Campuses;
 
 namespace EducationERP.Application.AcademicStructure;
 
+public sealed record CreateInstitutionDto(
+    string Code,
+    string Name,
+    string City,
+    string State,
+    string Country);
+
+public sealed record UpdateInstitutionDto(
+    string Code,
+    string Name,
+    string City,
+    string State,
+    string Country);
+
 public sealed record CreateCampusDto(
+    int InstitutionId,
     string Code,
     string Name,
     string City,
@@ -11,6 +26,7 @@ public sealed record CreateCampusDto(
     string BoardAffiliation);
 
 public sealed record UpdateCampusDto(
+    int InstitutionId,
     string Code,
     string Name,
     string City,

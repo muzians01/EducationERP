@@ -10,9 +10,12 @@ internal sealed class CampusService(EducationErpDbContext dbContext) : ICampusSe
     {
         return await dbContext.Campuses
             .AsNoTracking()
+            .Include(campus => campus.Institution)
             .OrderBy(campus => campus.Name)
             .Select(campus => new CampusDto(
                 campus.Id,
+                campus.InstitutionId,
+                campus.Institution!.Name,
                 campus.Code,
                 campus.Name,
                 campus.City,

@@ -16,6 +16,7 @@ import {
   ClassAttendanceRegister,
   CreateAcademicYear,
   CreateCampus,
+  CreateInstitution,
   CreateExamSchedule,
   CreateExamTerm,
   CreateAttendanceLeaveRequest,
@@ -39,6 +40,7 @@ import {
   FeesDashboard,
   Guardian,
   HomeworkAssignment,
+  Institution,
   SchoolClass,
   Section,
   Subject,
@@ -46,6 +48,7 @@ import {
   TimetablePeriod,
   UpdateAcademicYear,
   UpdateCampus,
+  UpdateInstitution,
   UpdateExamSchedule,
   UpdateExamTerm,
   UpdateHomeworkAssignment,
@@ -233,11 +236,27 @@ export class AppDataStore {
   }
 
   loadAcademicStructure(): void {
-    this.http.get<AcademicStructure>(`${this.apiBaseUrl}/academic-structure`).subscribe({
+    this.refreshAcademicStructure().subscribe({
       next: (structure) => {
         this.academicStructure.set(structure);
       }
     });
+  }
+
+  refreshAcademicStructure(): Observable<AcademicStructure> {
+    return this.http.get<AcademicStructure>(`${this.apiBaseUrl}/academic-structure`);
+  }
+
+  createInstitution(dto: CreateInstitution): Observable<Institution> {
+    return this.http.post<Institution>(`${this.apiBaseUrl}/academic-structure/institutions`, dto);
+  }
+
+  updateInstitution(institutionId: number, dto: UpdateInstitution): Observable<Institution> {
+    return this.http.put<Institution>(`${this.apiBaseUrl}/academic-structure/institutions/${institutionId}`, dto);
+  }
+
+  deleteInstitution(institutionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/academic-structure/institutions/${institutionId}`);
   }
 
   createCampus(dto: CreateCampus): Observable<Campus> {

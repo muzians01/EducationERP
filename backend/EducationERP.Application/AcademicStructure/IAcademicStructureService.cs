@@ -4,6 +4,10 @@ namespace EducationERP.Application.AcademicStructure;
 
 public interface IAcademicStructureService
 {
+    Task<IReadOnlyList<InstitutionDto>> GetInstitutionsAsync(CancellationToken cancellationToken = default);
+    Task<InstitutionDto> CreateInstitutionAsync(CreateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task<InstitutionDto> UpdateInstitutionAsync(int institutionId, UpdateInstitutionDto dto, CancellationToken cancellationToken = default);
+    Task DeleteInstitutionAsync(int institutionId, CancellationToken cancellationToken = default);
     Task<CampusDto> CreateCampusAsync(CreateCampusDto dto, CancellationToken cancellationToken = default);
     Task<CampusDto> UpdateCampusAsync(int campusId, UpdateCampusDto dto, CancellationToken cancellationToken = default);
     Task DeleteCampusAsync(int campusId, CancellationToken cancellationToken = default);

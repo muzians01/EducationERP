@@ -12,6 +12,9 @@ internal sealed class CampusConfiguration : IEntityTypeConfiguration<Campus>
 
         builder.HasKey(campus => campus.Id);
 
+        builder.Property(campus => campus.InstitutionId)
+            .IsRequired();
+
         builder.Property(campus => campus.Code)
             .HasMaxLength(20)
             .IsRequired();
@@ -36,16 +39,21 @@ internal sealed class CampusConfiguration : IEntityTypeConfiguration<Campus>
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.HasIndex(campus => campus.Code)
+        builder.HasIndex(campus => new { campus.InstitutionId, campus.Code })
             .IsUnique();
 
+        builder.HasOne(campus => campus.Institution)
+            .WithMany(institution => institution.Campuses)
+            .HasForeignKey(campus => campus.InstitutionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
-            new Campus("HQ", "Greenfield Public School", "Bengaluru", "Karnataka", "India", "CBSE")
+            new Campus(1, "HQ", "Greenfield Public School", "Bengaluru", "Karnataka", "India", "CBSE")
             {
                 Id = 1,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Local)
             },
-            new Campus("WEST", "Greenfield West Campus", "Mysuru", "Karnataka", "India", "ICSE")
+            new Campus(1, "WEST", "Greenfield West Campus", "Mysuru", "Karnataka", "India", "ICSE")
             {
                 Id = 2,
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Local)
