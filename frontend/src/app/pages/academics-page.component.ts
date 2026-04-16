@@ -268,6 +268,11 @@ import { CreateSubject, CreateTimetablePeriod, Subject, TimetablePeriod, UpdateS
           </div>
         </article>
       </div>
+    } @else {
+      <section class="notice" [class.notice--error]="!!store.loadError()">
+        <strong>{{ store.loadError() ? 'Academics workspace could not be loaded.' : 'Academics workspace is loading.' }}</strong>
+        <p>{{ store.loadError() || 'Subjects, sections, and timetable data are being fetched now.' }}</p>
+      </section>
     }
   `
 })
@@ -296,6 +301,14 @@ export class AcademicsPageComponent {
   protected timetableDraft: CreateTimetablePeriod = this.createEmptyTimetableDraft();
 
   constructor() {
+    if (!this.store.academicStructure()) {
+      this.store.loadAcademicStructure();
+    }
+
+    if (!this.store.academicsDashboard()) {
+      this.store.loadAcademicsDashboard(null, null);
+    }
+
     effect(() => {
       const academics = this.store.academicsDashboard();
 

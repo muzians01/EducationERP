@@ -52,7 +52,7 @@ internal sealed class FakeFeeService : IFeeService
     {
         var totalExpected = _studentFees.Sum(fee => fee.Amount);
         var totalConcessions = _studentFees.Sum(fee => fee.ConcessionAmount);
-        var totalCollected = _studentFees.Sum(fee => fee.AmountPaid);
+        var totalCollected = _payments.Sum(payment => payment.Amount);
         var outstanding = _studentFees.Sum(fee => fee.BalanceAmount);
 
         return Task.FromResult(new FeesDashboardDto(
@@ -99,6 +99,11 @@ internal sealed class FakeFeeService : IFeeService
         }
 
         var current = _payments[paymentIndex];
+        var feeIndex = _studentFees.FindIndex(fee =>
+            fee.StudentName == current.StudentName &&
+            fee.AdmissionNumber == current.AdmissionNumber &&
+            fee.FeeName == current.FeeName);
+
         _payments[paymentIndex] = current with
         {
             Amount = dto.Amount,
@@ -106,6 +111,21 @@ internal sealed class FakeFeeService : IFeeService
             PaymentReference = dto.PaymentReference,
             PaidOn = dto.PaidOn
         };
+
+        if (feeIndex >= 0)
+        {
+            var fee = _studentFees[feeIndex];
+            var revisedPaidAmount = Math.Max(0m, fee.AmountPaid - current.Amount + dto.Amount);
+            var revisedBalance = Math.Max(0m, fee.Amount - fee.ConcessionAmount - revisedPaidAmount);
+            var revisedStatus = revisedBalance == 0 ? "Paid" : revisedPaidAmount > 0 ? "Partially Paid" : "Pending";
+
+            _studentFees[feeIndex] = fee with
+            {
+                AmountPaid = revisedPaidAmount,
+                BalanceAmount = revisedBalance,
+                Status = revisedStatus
+            };
+        }
 
         var receiptIndex = _receipts.FindIndex(receipt => receipt.Id == paymentId);
         if (receiptIndex >= 0)
@@ -146,7 +166,8 @@ internal sealed class FakeFeeService : IFeeService
         _studentFees[feeIndex] = fee with
         {
             ConcessionAmount = fee.ConcessionAmount + dto.Amount,
-            BalanceAmount = Math.Max(0m, fee.Amount - (fee.ConcessionAmount + dto.Amount) - fee.AmountPaid)
+            BalanceAmount = Math.Max(0m, fee.Amount - (fee.ConcessionAmount + dto.Amount) - fee.AmountPaid),
+            Status = fee.AmountPaid >= fee.Amount - (fee.ConcessionAmount + dto.Amount) ? "Paid" : fee.AmountPaid > 0 ? "Partially Paid" : "Pending"
         };
 
         return Task.FromResult(concessionId);

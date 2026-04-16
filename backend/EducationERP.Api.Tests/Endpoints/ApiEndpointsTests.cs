@@ -585,6 +585,18 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
     }
 
     [Fact]
+    public async Task FeePaymentUpdateEndpoint_UpdatesPostedPayment()
+    {
+        var response = await _client.PutAsJsonAsync("/api/fees/payments/1", new UpdateFeePaymentDto(
+            26000m,
+            "Bank Transfer",
+            "RCPT-2026-001A",
+            new DateOnly(2026, 4, 5)));
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
     public async Task FeeReceiptEndpoint_ReturnsReceipt()
     {
         var receipt = await _client.GetFromJsonAsync<FeeReceiptDto>("/api/fees/receipts/1");
@@ -592,6 +604,14 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         Assert.NotNull(receipt);
         Assert.Equal("RCPT-2026-001", receipt.ReceiptNumber);
         Assert.Equal("Ishita Verma", receipt.StudentName);
+    }
+
+    [Fact]
+    public async Task FeeConcessionApprovalEndpoint_UpdatesApprover()
+    {
+        var response = await _client.PutAsJsonAsync("/api/fees/concessions/1/approve", new ApproveFeeConcessionDto("Finance Office"));
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     [Fact]

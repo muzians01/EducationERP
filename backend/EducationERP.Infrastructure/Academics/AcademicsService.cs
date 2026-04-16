@@ -219,15 +219,15 @@ internal sealed class AcademicsService(EducationErpDbContext dbContext) : IAcade
         var sections = await dbContext.Sections
             .AsNoTracking()
             .Include(section => section.SchoolClass)
-            .Where(section => scheduledSectionIds.Contains(section.Id))
             .Where(section => !classId.HasValue || section.SchoolClassId == classId.Value)
             .Where(section => !sectionId.HasValue || section.Id == sectionId.Value)
             .OrderBy(section => section.SchoolClass!.DisplayOrder)
             .ThenBy(section => section.Name)
             .ToListAsync(cancellationToken);
 
-        var section = sections.FirstOrDefault()
-            ?? throw new InvalidOperationException("No timetable roster found for the selected class and section.");
+        var section = sections.FirstOrDefault(item => scheduledSectionIds.Contains(item.Id))
+            ?? sections.FirstOrDefault()
+            ?? throw new InvalidOperationException("No class and section master data found for the selected roster.");
 
         return (section.SchoolClassId, section.SchoolClass!.Name, section.Id, section.Name);
     }

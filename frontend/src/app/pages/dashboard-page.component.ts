@@ -1,8 +1,9 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AppDataStore } from '../app.data';
+import { matchesSearch } from '../search.utils';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -57,6 +58,11 @@ import { AppDataStore } from '../app.data';
           <h2>Current school pulse</h2>
         </div>
 
+        <label class="list-search">
+          <span>Quick Search</span>
+          <input type="search" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" placeholder="Filter overview cards, students, receipts, and applications" />
+        </label>
+
         <div class="workspace-grid">
           <article class="data-card">
             <div class="data-card__header">
@@ -81,7 +87,7 @@ import { AppDataStore } from '../app.data';
             </div>
             @if (store.admissionsDashboard(); as admissions) {
               <div class="application-list">
-                @for (application of admissions.recentApplications; track application.id) {
+                @for (application of filteredApplications(); track application.id) {
                   <article class="application-item">
                     <div class="application-item__main">
                       <div>
@@ -105,7 +111,7 @@ import { AppDataStore } from '../app.data';
             </div>
             @if (store.feesDashboard(); as fees) {
               <div class="guardian-list">
-                @for (receipt of fees.recentReceipts; track receipt.id) {
+                @for (receipt of filteredReceipts(); track receipt.id) {
                   <article class="guardian-item">
                     <strong>{{ receipt.studentName }}</strong>
                     <p>{{ receipt.feeName }} - {{ receipt.paymentMethod }}</p>
@@ -125,7 +131,7 @@ import { AppDataStore } from '../app.data';
             </div>
             @if (store.attendanceMonthlyReport(); as report) {
               <div class="guardian-list">
-                @for (student of report.studentsNeedingAttention; track student.studentId) {
+                @for (student of filteredWatchlistStudents(); track student.studentId) {
                   <article class="guardian-item">
                     <strong>{{ student.studentName }}</strong>
                     <p>{{ student.className }} / {{ student.sectionName }}</p>
@@ -144,7 +150,7 @@ import { AppDataStore } from '../app.data';
               </div>
             </div>
             <div class="guardian-list">
-              @for (profile of store.studentProfiles(); track profile.id) {
+              @for (profile of filteredProfiles(); track profile.id) {
                 <article class="guardian-item">
                   <strong>{{ profile.studentName }}</strong>
                   <p>{{ profile.profileCompletionPercentage }}% complete</p>
@@ -160,6 +166,7 @@ import { AppDataStore } from '../app.data';
 })
 export class DashboardPageComponent {
   protected readonly store = inject(AppDataStore);
+  protected readonly searchQuery = signal('');
   protected readonly statusTone = (status: string) => status.toLowerCase().replace(/\s+/g, '-');
   protected readonly moduleLinks = [
     { label: 'Master Data', path: '/master-data' },
@@ -177,6 +184,22 @@ export class DashboardPageComponent {
     { step: 'Collections watch', summary: 'See what was collected and what is still pending.' },
     { step: 'Attendance risk', summary: 'Spot students and classes that need intervention.' }
   ];
+  protected readonly filteredApplications = computed(() =>
+    (this.store.admissionsDashboard()?.recentApplications ?? []).filter((application) =>
+      matchesSearch(this.searchQuery(), application.studentName, application.applicationNumber, application.campusName, application.status))
+  );
+  protected readonly filteredReceipts = computed(() =>
+    (this.store.feesDashboard()?.recentReceipts ?? []).filter((receipt) =>
+      matchesSearch(this.searchQuery(), receipt.studentName, receipt.feeName, receipt.paymentMethod, receipt.receiptNumber))
+  );
+  protected readonly filteredWatchlistStudents = computed(() =>
+    (this.store.attendanceMonthlyReport()?.studentsNeedingAttention ?? []).filter((student) =>
+      matchesSearch(this.searchQuery(), student.studentName, student.className, student.sectionName, student.attendancePercentage))
+  );
+  protected readonly filteredProfiles = computed(() =>
+    this.store.studentProfiles().filter((profile) =>
+      matchesSearch(this.searchQuery(), profile.studentName, profile.className, profile.sectionName, profile.primaryContactNumber))
+  );
 
   protected readonly metrics = computed(() => {
     const admissions = this.store.admissionsDashboard();

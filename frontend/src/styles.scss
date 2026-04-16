@@ -35,3 +35,173 @@ button:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 32px rgba(194, 65, 12, 0.12);
 }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button--primary {
+  background: linear-gradient(135deg, #c2410c, #f97316);
+  color: #fff7ed;
+}
+
+.button--secondary {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.button--danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.button--small {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-field span {
+  color: #7a5660;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(194, 65, 12, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  color: #1b2435;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.form-actions--inline {
+  margin-top: 0.75rem;
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
+.list-search {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.list-search span {
+  color: #7a5660;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.list-search input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(194, 65, 12, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  color: #1b2435;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-chip--new {
+  background: rgba(251, 191, 36, 0.18);
+  color: #92400e;
+}
+
+.status-chip--approved {
+  background: rgba(34, 197, 94, 0.14);
+  color: #166534;
+}
+
+.status-chip--waitlisted {
+  background: rgba(59, 130, 246, 0.14);
+  color: #1d4ed8;
+}
+
+.status-chip--present,
+.status-chip--active {
+  background: rgba(34, 197, 94, 0.14);
+  color: #166534;
+}
+
+.status-chip--inactive,
+.status-chip--idle {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+
+.status-chip--under-maintenance,
+.status-chip--maintenance {
+  background: rgba(251, 191, 36, 0.18);
+  color: #92400e;
+}
+
+.status-chip--absent {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
+}
+
+.status-chip--late {
+  background: rgba(234, 179, 8, 0.18);
+  color: #92400e;
+}
+
+.status-chip--unmarked {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+
+.application-list::-webkit-scrollbar,
+.guardian-list::-webkit-scrollbar,
+.data-card::-webkit-scrollbar {
+  width: 10px;
+}
+
+.application-list::-webkit-scrollbar-thumb,
+.guardian-list::-webkit-scrollbar-thumb,
+.data-card::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(194, 65, 12, 0.22);
+}
