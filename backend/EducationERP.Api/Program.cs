@@ -327,64 +327,127 @@ app.MapGet("/api/academic-structure", async (IAcademicStructureService academicS
 
 app.MapGet("/api/academics/subjects", async (IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var subjects = await academicsService.GetSubjectsAsync(cancellationToken);
-    return Results.Ok(subjects);
+    try
+    {
+        var subjects = await academicsService.GetSubjectsAsync(cancellationToken);
+        return Results.Ok(subjects);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("GetSubjects");
 
 app.MapPost("/api/academics/subjects", async (CreateSubjectDto dto, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var subject = await academicsService.CreateSubjectAsync(dto, cancellationToken);
-    return Results.Created($"/api/academics/subjects/{subject.Id}", subject);
+    try
+    {
+        var subject = await academicsService.CreateSubjectAsync(dto, cancellationToken);
+        return Results.Created($"/api/academics/subjects/{subject.Id}", subject);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("CreateSubject");
 
 app.MapPut("/api/academics/subjects/{subjectId}", async (int subjectId, UpdateSubjectDto dto, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var subject = await academicsService.UpdateSubjectAsync(subjectId, dto, cancellationToken);
-    return Results.Ok(subject);
+    try
+    {
+        var subject = await academicsService.UpdateSubjectAsync(subjectId, dto, cancellationToken);
+        return Results.Ok(subject);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("UpdateSubject");
 
 app.MapDelete("/api/academics/subjects/{subjectId}", async (int subjectId, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    await academicsService.DeleteSubjectAsync(subjectId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicsService.DeleteSubjectAsync(subjectId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("DeleteSubject");
 
 app.MapGet("/api/academics/timetable", async (int? classId, int? sectionId, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var timetable = await academicsService.GetTimetableAsync(classId, sectionId, cancellationToken);
-    return Results.Ok(timetable);
+    try
+    {
+        var timetable = await academicsService.GetTimetableAsync(classId, sectionId, cancellationToken);
+        return Results.Ok(timetable);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("GetTimetable");
 
 app.MapPost("/api/academics/timetable", async (CreateTimetablePeriodDto dto, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var period = await academicsService.CreateTimetablePeriodAsync(dto, cancellationToken);
-    return Results.Created($"/api/academics/timetable/{period.Id}", period);
+    try
+    {
+        var period = await academicsService.CreateTimetablePeriodAsync(dto, cancellationToken);
+        return Results.Created($"/api/academics/timetable/{period.Id}", period);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("CreateTimetablePeriod");
 
 app.MapPut("/api/academics/timetable/{timetablePeriodId}", async (int timetablePeriodId, UpdateTimetablePeriodDto dto, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var period = await academicsService.UpdateTimetablePeriodAsync(timetablePeriodId, dto, cancellationToken);
-    return Results.Ok(period);
+    try
+    {
+        var period = await academicsService.UpdateTimetablePeriodAsync(timetablePeriodId, dto, cancellationToken);
+        return Results.Ok(period);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("UpdateTimetablePeriod");
 
 app.MapDelete("/api/academics/timetable/{timetablePeriodId}", async (int timetablePeriodId, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    await academicsService.DeleteTimetablePeriodAsync(timetablePeriodId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await academicsService.DeleteTimetablePeriodAsync(timetablePeriodId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("DeleteTimetablePeriod");
 
 app.MapGet("/api/academics/dashboard", async (int? classId, int? sectionId, IAcademicsService academicsService, CancellationToken cancellationToken) =>
 {
-    var dashboard = await academicsService.GetDashboardAsync(classId, sectionId, cancellationToken);
-    return Results.Ok(dashboard);
+    try
+    {
+        var dashboard = await academicsService.GetDashboardAsync(classId, sectionId, cancellationToken);
+        return Results.Ok(dashboard);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("academics", exception);
+    }
 })
 .WithName("GetAcademicsDashboard");
 
@@ -397,113 +460,225 @@ app.MapGet("/api/examinations/terms", async (IExaminationsService examinationsSe
 
 app.MapPost("/api/examinations/terms", async (CreateExamTermDto dto, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var term = await examinationsService.CreateExamTermAsync(dto, cancellationToken);
-    return Results.Created($"/api/examinations/terms/{term.Id}", term);
+    try
+    {
+        var term = await examinationsService.CreateExamTermAsync(dto, cancellationToken);
+        return Results.Created($"/api/examinations/terms/{term.Id}", term);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("CreateExamTerm");
 
 app.MapPut("/api/examinations/terms/{examTermId:int}", async (int examTermId, UpdateExamTermDto dto, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var term = await examinationsService.UpdateExamTermAsync(examTermId, dto, cancellationToken);
-    return Results.Ok(term);
+    try
+    {
+        var term = await examinationsService.UpdateExamTermAsync(examTermId, dto, cancellationToken);
+        return Results.Ok(term);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("UpdateExamTerm");
 
 app.MapDelete("/api/examinations/terms/{examTermId:int}", async (int examTermId, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    await examinationsService.DeleteExamTermAsync(examTermId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await examinationsService.DeleteExamTermAsync(examTermId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("DeleteExamTerm");
 
 app.MapGet("/api/examinations/schedule", async (int? examTermId, int? classId, int? sectionId, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var schedule = await examinationsService.GetExamScheduleAsync(examTermId, classId, sectionId, cancellationToken);
-    return Results.Ok(schedule);
+    try
+    {
+        var schedule = await examinationsService.GetExamScheduleAsync(examTermId, classId, sectionId, cancellationToken);
+        return Results.Ok(schedule);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("GetExamSchedule");
 
 app.MapPost("/api/examinations/schedule", async (CreateExamScheduleDto dto, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var schedule = await examinationsService.CreateExamScheduleAsync(dto, cancellationToken);
-    return Results.Created($"/api/examinations/schedule/{schedule.Id}", schedule);
+    try
+    {
+        var schedule = await examinationsService.CreateExamScheduleAsync(dto, cancellationToken);
+        return Results.Created($"/api/examinations/schedule/{schedule.Id}", schedule);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("CreateExamSchedule");
 
 app.MapPut("/api/examinations/schedule/{examScheduleId:int}", async (int examScheduleId, UpdateExamScheduleDto dto, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var schedule = await examinationsService.UpdateExamScheduleAsync(examScheduleId, dto, cancellationToken);
-    return Results.Ok(schedule);
+    try
+    {
+        var schedule = await examinationsService.UpdateExamScheduleAsync(examScheduleId, dto, cancellationToken);
+        return Results.Ok(schedule);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("UpdateExamSchedule");
 
 app.MapDelete("/api/examinations/schedule/{examScheduleId:int}", async (int examScheduleId, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    await examinationsService.DeleteExamScheduleAsync(examScheduleId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await examinationsService.DeleteExamScheduleAsync(examScheduleId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("DeleteExamSchedule");
 
 app.MapGet("/api/examinations/dashboard", async (int? examTermId, int? classId, int? sectionId, IExaminationsService examinationsService, CancellationToken cancellationToken) =>
 {
-    var dashboard = await examinationsService.GetDashboardAsync(examTermId, classId, sectionId, cancellationToken);
-    return Results.Ok(dashboard);
+    try
+    {
+        var dashboard = await examinationsService.GetDashboardAsync(examTermId, classId, sectionId, cancellationToken);
+        return Results.Ok(dashboard);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("examinations", exception);
+    }
 })
 .WithName("GetExaminationsDashboard");
 
 app.MapGet("/api/homework/assignments", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var assignments = await homeworkService.GetAssignmentsAsync(classId, sectionId, cancellationToken);
-    return Results.Ok(assignments);
+    try
+    {
+        var assignments = await homeworkService.GetAssignmentsAsync(classId, sectionId, cancellationToken);
+        return Results.Ok(assignments);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("GetHomeworkAssignments");
 
 app.MapPost("/api/homework/assignments", async (CreateHomeworkAssignmentDto dto, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var assignment = await homeworkService.CreateAssignmentAsync(dto, cancellationToken);
-    return Results.Created($"/api/homework/assignments/{assignment.Id}", assignment);
+    try
+    {
+        var assignment = await homeworkService.CreateAssignmentAsync(dto, cancellationToken);
+        return Results.Created($"/api/homework/assignments/{assignment.Id}", assignment);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("CreateHomeworkAssignment");
 
 app.MapPut("/api/homework/assignments/{homeworkAssignmentId:int}", async (int homeworkAssignmentId, UpdateHomeworkAssignmentDto dto, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var assignment = await homeworkService.UpdateAssignmentAsync(homeworkAssignmentId, dto, cancellationToken);
-    return Results.Ok(assignment);
+    try
+    {
+        var assignment = await homeworkService.UpdateAssignmentAsync(homeworkAssignmentId, dto, cancellationToken);
+        return Results.Ok(assignment);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("UpdateHomeworkAssignment");
 
 app.MapDelete("/api/homework/assignments/{homeworkAssignmentId:int}", async (int homeworkAssignmentId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    await homeworkService.DeleteAssignmentAsync(homeworkAssignmentId, cancellationToken);
-    return Results.NoContent();
+    try
+    {
+        await homeworkService.DeleteAssignmentAsync(homeworkAssignmentId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("DeleteHomeworkAssignment");
 
 app.MapGet("/api/homework/progress", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var progress = await homeworkService.GetProgressAsync(classId, sectionId, cancellationToken);
-    return Results.Ok(progress);
+    try
+    {
+        var progress = await homeworkService.GetProgressAsync(classId, sectionId, cancellationToken);
+        return Results.Ok(progress);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("GetHomeworkProgress");
 
 app.MapPut("/api/homework/progress", async (UpdateHomeworkSubmissionDto dto, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var progress = await homeworkService.UpdateSubmissionAsync(dto, cancellationToken);
-    return Results.Ok(progress);
+    try
+    {
+        var progress = await homeworkService.UpdateSubmissionAsync(dto, cancellationToken);
+        return Results.Ok(progress);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("UpdateHomeworkSubmission");
 
 app.MapGet("/api/homework/dashboard", async (int? classId, int? sectionId, IHomeworkService homeworkService, CancellationToken cancellationToken) =>
 {
-    var dashboard = await homeworkService.GetDashboardAsync(classId, sectionId, cancellationToken);
-    return Results.Ok(dashboard);
+    try
+    {
+        var dashboard = await homeworkService.GetDashboardAsync(classId, sectionId, cancellationToken);
+        return Results.Ok(dashboard);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("homework", exception);
+    }
 })
 .WithName("GetHomeworkDashboard");
 
 app.MapGet("/api/parent-portal/dashboard", async (int? studentId, IParentPortalService parentPortalService, CancellationToken cancellationToken) =>
 {
-    var dashboard = await parentPortalService.GetDashboardAsync(studentId, cancellationToken);
-    return Results.Ok(dashboard);
+    try
+    {
+        var dashboard = await parentPortalService.GetDashboardAsync(studentId, cancellationToken);
+        return Results.Ok(dashboard);
+    }
+    catch (Exception exception) when (exception is InvalidOperationException or DbUpdateException)
+    {
+        return CreateValidationProblem("parentPortal", exception);
+    }
 })
 .WithName("GetParentPortalDashboard");
 
@@ -889,9 +1064,14 @@ app.MapPost("/api/setup/database/migrate", async (EducationErpDbContext dbContex
 
 static IResult CreateMasterDataValidationProblem(Exception exception)
 {
+    return CreateValidationProblem("masterData", exception);
+}
+
+static IResult CreateValidationProblem(string key, Exception exception)
+{
     return Results.ValidationProblem(new Dictionary<string, string[]>
     {
-        ["masterData"] = [exception.Message]
+        [key] = [exception.Message]
     });
 }
 

@@ -40,7 +40,12 @@ internal sealed class FakeHomeworkService : IHomeworkService
 
     public Task DeleteAssignmentAsync(int homeworkAssignmentId, CancellationToken cancellationToken = default)
     {
-        _assignments.RemoveAll(item => item.Id == homeworkAssignmentId);
+        var removedCount = _assignments.RemoveAll(item => item.Id == homeworkAssignmentId);
+        if (removedCount == 0)
+        {
+            throw new InvalidOperationException("Homework assignment not found.");
+        }
+
         _progress.RemoveAll(item => item.HomeworkAssignmentId == homeworkAssignmentId);
         return Task.CompletedTask;
     }

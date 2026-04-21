@@ -1,15 +1,68 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { AppDataStore } from '../app.data';
 
 @Component({
   selector: 'app-parent-portal-page',
-  imports: [CurrencyPipe, DatePipe],
+  imports: [CurrencyPipe, DatePipe, FormsModule],
   template: `
     <section class="section-heading">
       <p class="eyebrow">Parent Portal</p>
       <h2>Student progress, fees, homework, and classroom day at a glance</h2>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="data-card">
+        <div class="data-card__header">
+          <div>
+            <p class="eyebrow">Student Switcher</p>
+            <h3>Open the portal for a linked learner</h3>
+          </div>
+        </div>
+        <div class="attendance-filter-grid">
+          <label class="attendance-remark-field attendance-remark-field--compact">
+            <span>Student</span>
+            <select [ngModel]="selectedStudentId()" (ngModelChange)="selectedStudentId.set($event)">
+              @for (student of studentOptions(); track student.id) {
+                <option [ngValue]="student.id">{{ student.studentName }} - {{ student.className }} / {{ student.sectionName }}</option>
+              }
+            </select>
+          </label>
+          <button
+            type="button"
+            class="button button--secondary"
+            [disabled]="!selectedStudentId() || store.isLoadingParentPortal()"
+            (click)="loadPortal()">
+            {{ store.isLoadingParentPortal() ? 'Loading...' : 'Load portal' }}
+          </button>
+        </div>
+        @if (store.parentPortalError(); as errorMessage) {
+          <div class="notice notice--error">
+            <strong>Parent portal update failed.</strong>
+            <p>{{ errorMessage }}</p>
+          </div>
+        }
+      </article>
+
+      @if (store.parentPortalDashboard(); as portal) {
+        <article class="data-card">
+          <div class="data-card__header">
+            <div>
+              <p class="eyebrow">Snapshot</p>
+              <h3>Current student context</h3>
+            </div>
+          </div>
+          <div class="guardian-list">
+            <article class="guardian-item">
+              <strong>{{ portal.studentName }}</strong>
+              <p>{{ portal.admissionNumber }} - {{ portal.className }} / {{ portal.sectionName }}</p>
+              <span>{{ portal.guardianName }} | {{ portal.guardianPhoneNumber }}</span>
+            </article>
+          </div>
+        </article>
+      }
     </section>
 
     @if (store.parentPortalDashboard(); as portal) {
@@ -202,8 +255,43 @@ import { AppDataStore } from '../app.data';
         </article>
       </div>
     }
+
+    @if (!store.parentPortalDashboard() && !store.isLoadingParentPortal()) {
+      <section class="notice" [class.notice--error]="!!store.parentPortalError()">
+        <strong>{{ store.parentPortalError() ? 'Parent portal is unavailable.' : 'Parent portal is ready to load.' }}</strong>
+        <p>{{ store.parentPortalError() || 'Choose a student above to load attendance, homework, exam, and fee details.' }}</p>
+      </section>
+    }
   `
 })
 export class ParentPortalPageComponent {
   protected readonly store = inject(AppDataStore);
+  protected readonly selectedStudentId = signal<number | null>(null);
+  protected readonly studentOptions = computed(() => this.store.students());
+  private hasLoadedInitialPortal = false;
+
+  constructor() {
+    effect(() => {
+      const currentPortal = this.store.parentPortalDashboard();
+      const students = this.studentOptions();
+
+      if (currentPortal) {
+        this.selectedStudentId.set(currentPortal.studentId);
+        return;
+      }
+
+      if (!this.selectedStudentId() && students.length > 0) {
+        this.selectedStudentId.set(students[0].id);
+      }
+
+      if (!currentPortal && !this.store.isLoadingParentPortal() && students.length > 0 && !this.hasLoadedInitialPortal) {
+        this.hasLoadedInitialPortal = true;
+        this.store.loadParentPortal(this.selectedStudentId() ?? students[0].id);
+      }
+    });
+  }
+
+  protected loadPortal(): void {
+    this.store.loadParentPortal(this.selectedStudentId());
+  }
 }

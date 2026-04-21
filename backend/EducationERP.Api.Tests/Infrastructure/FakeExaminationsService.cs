@@ -41,7 +41,12 @@ internal sealed class FakeExaminationsService : IExaminationsService
 
     public Task DeleteExamTermAsync(int examTermId, CancellationToken cancellationToken = default)
     {
-        _terms.RemoveAll(term => term.Id == examTermId);
+        var removedCount = _terms.RemoveAll(term => term.Id == examTermId);
+        if (removedCount == 0)
+        {
+            throw new InvalidOperationException("Exam term not found.");
+        }
+
         _schedule.RemoveAll(schedule => schedule.ExamTermId == examTermId);
         return Task.CompletedTask;
     }
@@ -84,7 +89,12 @@ internal sealed class FakeExaminationsService : IExaminationsService
 
     public Task DeleteExamScheduleAsync(int examScheduleId, CancellationToken cancellationToken = default)
     {
-        _schedule.RemoveAll(schedule => schedule.Id == examScheduleId);
+        var removedCount = _schedule.RemoveAll(schedule => schedule.Id == examScheduleId);
+        if (removedCount == 0)
+        {
+            throw new InvalidOperationException("Exam schedule not found.");
+        }
+
         return Task.CompletedTask;
     }
 

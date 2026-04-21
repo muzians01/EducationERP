@@ -258,6 +258,24 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
     }
 
     [Fact]
+    public async Task SubjectUpdateEndpoint_ReturnsValidationProblem_WhenSubjectDoesNotExist()
+    {
+        var response = await _client.PutAsJsonAsync("/api/academics/subjects/999", new UpdateSubjectDto(
+            "ART",
+            "Art",
+            "Elective",
+            2));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("academics", payload.Errors.Keys);
+        Assert.Contains("Subject not found.", payload.Errors["academics"]);
+    }
+
+    [Fact]
     public async Task TimetableCreationEndpoint_CreatesTimetableSlot()
     {
         var response = await _client.PostAsJsonAsync("/api/academics/timetable", new CreateTimetablePeriodDto(
@@ -340,6 +358,27 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
     }
 
     [Fact]
+    public async Task ExamTermUpdateEndpoint_ReturnsValidationProblem_WhenExamTermDoesNotExist()
+    {
+        var response = await _client.PutAsJsonAsync("/api/examinations/terms/999", new UpdateExamTermDto(
+            1,
+            1,
+            "Missing Term",
+            "Scholastic",
+            new DateOnly(2026, 11, 10),
+            new DateOnly(2026, 11, 14),
+            "Draft"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("examinations", payload.Errors.Keys);
+        Assert.Contains("Exam term not found.", payload.Errors["examinations"]);
+    }
+
+    [Fact]
     public async Task ExamScheduleCreationEndpoint_CreatesSchedule()
     {
         var response = await _client.PostAsJsonAsync("/api/examinations/schedule", new CreateExamScheduleDto(
@@ -373,6 +412,20 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
         Assert.Single(dashboard.UpcomingHomework);
         Assert.Single(dashboard.OutstandingFeeItems);
         Assert.Single(dashboard.ExamResults);
+    }
+
+    [Fact]
+    public async Task ParentPortalDashboardEndpoint_ReturnsValidationProblem_WhenStudentDoesNotExist()
+    {
+        var response = await _client.GetAsync("/api/parent-portal/dashboard?studentId=999");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("parentPortal", payload.Errors.Keys);
+        Assert.Contains("No student found for the parent portal.", payload.Errors["parentPortal"]);
     }
 
     [Fact]
@@ -456,6 +509,20 @@ public sealed class ApiEndpointsTests(EducationErpApiFactory factory) : IClassFi
 
         Assert.NotNull(assignment);
         Assert.Equal("Grammar worksheet", assignment.Title);
+    }
+
+    [Fact]
+    public async Task HomeworkDeleteEndpoint_ReturnsValidationProblem_WhenAssignmentDoesNotExist()
+    {
+        var response = await _client.DeleteAsync("/api/homework/assignments/999");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var payload = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(payload);
+        Assert.Contains("homework", payload.Errors.Keys);
+        Assert.Contains("Homework assignment not found.", payload.Errors["homework"]);
     }
 
     [Fact]

@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { AppDataStore } from '../app.data';
+import { extractApiErrorMessage } from '../api-error.utils';
 import { CreateExamSchedule, CreateExamTerm, ExamSchedule, ExamTerm, UpdateExamSchedule, UpdateExamTerm } from '../app.models';
 
 @Component({
@@ -243,7 +244,7 @@ import { CreateExamSchedule, CreateExamTerm, ExamSchedule, ExamTerm, UpdateExamS
                     <button type="button" class="button button--small button--danger" (click)="deleteExamTerm(term.id)">Delete</button>
                   </div>
                 </div>
-                <span>{{ term.startDate | date: 'dd MMM' }} to {{ term.endDate | date: 'dd MMM yyyy' }} · {{ term.status }}</span>
+                <span>{{ term.startDate | date: 'dd MMM' }} to {{ term.endDate | date: 'dd MMM yyyy' }} - {{ term.status }}</span>
               </article>
             }
           </div>
@@ -395,9 +396,9 @@ export class ExaminationsPageComponent {
         this.resetExamTermDraft();
         this.store.loadExaminationsDashboard(this.selectedExamTermId(), this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Exam term could not be saved.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Exam term could not be saved.'));
       }
     });
   }
@@ -426,9 +427,9 @@ export class ExaminationsPageComponent {
         this.feedbackMessage.set('Exam term deleted successfully.');
         this.store.loadExaminationsDashboard(this.selectedExamTermId(), this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Exam term could not be deleted.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Exam term could not be deleted.'));
       }
     });
   }
@@ -449,9 +450,9 @@ export class ExaminationsPageComponent {
         this.resetExamScheduleDraft();
         this.store.loadExaminationsDashboard(this.selectedExamTermId(), this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Exam schedule could not be saved.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Exam schedule could not be saved.'));
       }
     });
   }
@@ -482,9 +483,9 @@ export class ExaminationsPageComponent {
         this.feedbackMessage.set('Exam schedule deleted successfully.');
         this.store.loadExaminationsDashboard(this.selectedExamTermId(), this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Exam schedule could not be deleted.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Exam schedule could not be deleted.'));
       }
     });
   }

@@ -4,8 +4,15 @@ namespace EducationERP.Api.Tests.Infrastructure;
 
 internal sealed class FakeParentPortalService : IParentPortalService
 {
+    private static readonly HashSet<int> ValidStudentIds = [1, 2];
+
     public Task<ParentPortalDashboardDto> GetDashboardAsync(int? studentId = null, CancellationToken cancellationToken = default)
     {
+        if (studentId.HasValue && !ValidStudentIds.Contains(studentId.Value))
+        {
+            throw new InvalidOperationException("No student found for the parent portal.");
+        }
+
         return Task.FromResult(new ParentPortalDashboardDto(
             studentId ?? 1,
             "Ishita Verma",

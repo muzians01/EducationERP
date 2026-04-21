@@ -70,7 +70,12 @@ internal sealed class FakeAcademicsService : IAcademicsService
 
     public Task DeleteSubjectAsync(int subjectId, CancellationToken cancellationToken = default)
     {
-        _subjects.RemoveAll(subject => subject.Id == subjectId);
+        var removedCount = _subjects.RemoveAll(subject => subject.Id == subjectId);
+        if (removedCount == 0)
+        {
+            throw new InvalidOperationException("Subject not found.");
+        }
+
         return Task.CompletedTask;
     }
 
@@ -129,7 +134,12 @@ internal sealed class FakeAcademicsService : IAcademicsService
 
     public Task DeleteTimetablePeriodAsync(int timetablePeriodId, CancellationToken cancellationToken = default)
     {
-        _timetable.RemoveAll(period => period.Id == timetablePeriodId);
+        var removedCount = _timetable.RemoveAll(period => period.Id == timetablePeriodId);
+        if (removedCount == 0)
+        {
+            throw new InvalidOperationException("Timetable period not found.");
+        }
+
         return Task.CompletedTask;
     }
 }

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppDataStore } from '../app.data';
+import { extractApiErrorMessage } from '../api-error.utils';
 import { CreateSubject, CreateTimetablePeriod, Subject, TimetablePeriod, UpdateSubject, UpdateTimetablePeriod } from '../app.models';
 
 @Component({
@@ -356,9 +357,9 @@ export class AcademicsPageComponent {
         this.resetSubjectDraft();
         this.store.loadAcademicsDashboard(this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Subject changes could not be saved.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Subject changes could not be saved.'));
       }
     });
   }
@@ -386,9 +387,9 @@ export class AcademicsPageComponent {
         this.feedbackMessage.set('Subject deleted successfully.');
         this.store.loadAcademicsDashboard(this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Subject could not be deleted.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Subject could not be deleted.'));
       }
     });
   }
@@ -410,9 +411,9 @@ export class AcademicsPageComponent {
         this.resetTimetableDraft();
         this.store.loadAcademicsDashboard(this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Timetable slot could not be saved.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Timetable slot could not be saved.'));
       }
     });
   }
@@ -445,9 +446,9 @@ export class AcademicsPageComponent {
         this.feedbackMessage.set('Timetable slot deleted successfully.');
         this.store.loadAcademicsDashboard(this.selectedClassId(), this.selectedSectionId());
       },
-      error: () => {
+      error: (error) => {
         this.feedbackTone.set('error');
-        this.feedbackMessage.set('Timetable slot could not be deleted.');
+        this.feedbackMessage.set(extractApiErrorMessage(error, 'Timetable slot could not be deleted.'));
       }
     });
   }

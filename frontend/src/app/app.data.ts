@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
+import { extractApiErrorMessage } from './api-error.utils';
 
 import {
   AcademicStructure,
@@ -91,6 +92,8 @@ export class AppDataStore {
   readonly examinationsDashboard = signal<ExaminationsDashboard | null>(null);
   readonly homeworkDashboard = signal<HomeworkDashboard | null>(null);
   readonly parentPortalDashboard = signal<ParentPortalDashboard | null>(null);
+  readonly isLoadingParentPortal = signal(false);
+  readonly parentPortalError = signal<string | null>(null);
   readonly attendanceDashboard = signal<AttendanceDashboard | null>(null);
   readonly attendanceMonthlyReport = signal<AttendanceMonthlyReport | null>(null);
   readonly attendanceEntryBoard = signal<AttendanceEntryBoard | null>(null);
@@ -392,11 +395,18 @@ export class AppDataStore {
   }
 
   loadParentPortal(studentId: number | null): void {
+    this.isLoadingParentPortal.set(true);
+    this.parentPortalError.set(null);
     const query = studentId ? `?studentId=${studentId}` : '';
 
     this.http.get<ParentPortalDashboard>(`${this.apiBaseUrl}/parent-portal/dashboard${query}`).subscribe({
       next: (dashboard) => {
         this.parentPortalDashboard.set(dashboard);
+        this.isLoadingParentPortal.set(false);
+      },
+      error: (error) => {
+        this.parentPortalError.set(extractApiErrorMessage(error, 'Parent portal data could not be loaded for the selected student.'));
+        this.isLoadingParentPortal.set(false);
       }
     });
   }
@@ -621,6 +631,8 @@ export class AppDataStore {
     this.examinationsDashboard.set(payload.examinationsDashboard);
     this.homeworkDashboard.set(payload.homeworkDashboard);
     this.parentPortalDashboard.set(payload.parentPortalDashboard);
+    this.parentPortalError.set(null);
+    this.isLoadingParentPortal.set(false);
     this.attendanceDashboard.set(payload.attendanceDashboard);
     this.attendanceMonthlyReport.set(payload.attendanceMonthlyReport);
     this.attendanceEntryBoard.set(payload.attendanceEntryBoard);

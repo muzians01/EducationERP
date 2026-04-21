@@ -98,7 +98,7 @@ import { CreateAdmissionApplication } from '../app.models';
           <select formControlName="sectionId">
             <option value="">Select section</option>
             @for (section of availableSections(); track section.id) {
-              <option [value]="section.id">{{ section.name }} · {{ section.roomNumber }}</option>
+              <option [value]="section.id">{{ section.name }} - {{ section.roomNumber }}</option>
             }
           </select>
         </label>
@@ -107,7 +107,7 @@ import { CreateAdmissionApplication } from '../app.models';
           <select formControlName="guardianId">
             <option value="">Select guardian</option>
             @for (guardian of store.admissionGuardians(); track guardian.id) {
-              <option [value]="guardian.id">{{ guardian.fullName }} · {{ guardian.relationship }}</option>
+              <option [value]="guardian.id">{{ guardian.fullName }} - {{ guardian.relationship }}</option>
             }
           </select>
         </label>
@@ -143,7 +143,7 @@ import { CreateAdmissionApplication } from '../app.models';
               <div class="application-item__main">
                 <div>
                   <strong>{{ application.studentName }}</strong>
-                  <p>{{ application.applicationNumber }} · {{ application.campusName }}</p>
+                  <p>{{ application.applicationNumber }} - {{ application.campusName }}</p>
                 </div>
                 <span class="status-chip" [class]="'status-chip status-chip--' + statusTone(application.status)">{{ application.status }}</span>
               </div>
@@ -189,8 +189,8 @@ import { CreateAdmissionApplication } from '../app.models';
           @for (guardian of store.admissionGuardians(); track guardian.id) {
             <article class="guardian-item">
               <strong>{{ guardian.fullName }}</strong>
-              <p>{{ guardian.relationship }} · {{ guardian.occupation }}</p>
-              <p>{{ guardian.phoneNumber }} · {{ guardian.email }}</p>
+              <p>{{ guardian.relationship }} - {{ guardian.occupation }}</p>
+              <p>{{ guardian.phoneNumber }} - {{ guardian.email }}</p>
               <span>{{ guardian.campusName }}</span>
             </article>
           }
@@ -229,7 +229,7 @@ import { CreateAdmissionApplication } from '../app.models';
               <div class="application-item__main">
                 <div>
                   <strong>{{ document.documentType }}</strong>
-                  <p>{{ document.studentName }} · {{ document.admissionNumber }}</p>
+                  <p>{{ document.studentName }} - {{ document.admissionNumber }}</p>
                 </div>
                 <span class="status-chip" [class]="'status-chip status-chip--' + statusTone(document.status)">{{ document.status }}</span>
               </div>
